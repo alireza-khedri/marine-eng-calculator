@@ -6,12 +6,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600&display=swap');
 
 :root{
-  --bg:            #0a1b2a;
-  --bg-deep:       #071522;
-  --panel:         #102a3f;
-  --panel-2:       #14344c;
-  --border:        #23445e;
-  --border-soft:   #1a3348;
+  --bg:            #1e1e1e;
+  --bg-deep:       #161616;
+  --panel:         #3b3b3b;
+  --panel-2:       #454545;
+  --border:        #575757;
+  --border-soft:   #494949;
 
   --brass:         #c9a15c;
   --brass-bright:  #e0bc7d;
