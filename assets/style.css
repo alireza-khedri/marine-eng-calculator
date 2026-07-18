@@ -3,15 +3,15 @@
    هویت بصری: تابلوی فرمان اتاق موتور کشتی — برنج، فولاد، اقیانوس عمیق
    =========================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;600&display=swap');
 
 :root{
-  --bg:            #1e1e1e;
+  --bg:            #06080c;
   --bg-deep:       #161616;
-  --panel:         #3b3b3b;
-  --panel-2:       #454545;
-  --border:        #575757;
-  --border-soft:   #494949;
+  --panel:         #0d1117;
+  --panel-2:       #0d1117;
+  --border:        #3d444d;
+  --border-soft:   #3d444d;
 
   --brass:         #c9a15c;
   --brass-bright:  #e0bc7d;
