@@ -22,11 +22,11 @@
 
   --danger:        #c1554a;
 
-  --text:          #e9eef3;
-  --text-dim:      #9fb2c2;
-  --text-faint:    #6c8296;
+  --text:          #f0f6fc;
+  --text-dim:      #f0f6fc;
+  --text-faint:    #9198a1;
 
-  --radius:        10px;
+  --radius:        8px;
   --font-display:  'Vazirmatn', 'B Nazanin', 'Tahoma', sans-serif;
   --font-body:     'Vazirmatn', 'B Nazanin', 'Tahoma', sans-serif;
   --font-mono:     'Roboto Mono', monospace;
@@ -50,12 +50,6 @@ body{
 }
 
 /* subtle blueprint grid on the deep background */
-.grid-bg{
-  background-image:
-    linear-gradient(rgba(201,161,92,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,161,92,0.05) 1px, transparent 1px);
-  background-size: 42px 42px;
-}
 
 a{ color: inherit; text-decoration: none; }
 
