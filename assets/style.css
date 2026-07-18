@@ -1,0 +1,433 @@
+/* ===========================================================
+   دریانورد | ماشین‌حساب مهندسی ماشین‌آلات دریایی
+   هویت بصری: تابلوی فرمان اتاق موتور کشتی — برنج، فولاد، اقیانوس عمیق
+   =========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg:            #0a1b2a;
+  --bg-deep:       #071522;
+  --panel:         #102a3f;
+  --panel-2:       #14344c;
+  --border:        #23445e;
+  --border-soft:   #1a3348;
+
+  --brass:         #c9a15c;
+  --brass-bright:  #e0bc7d;
+  --brass-dim:     #8a6e3d;
+
+  --teal:          #5fa8a0;
+  --teal-dim:      #3d716b;
+
+  --danger:        #c1554a;
+
+  --text:          #e9eef3;
+  --text-dim:      #9fb2c2;
+  --text-faint:    #6c8296;
+
+  --radius:        10px;
+  --font-display:  'Vazirmatn', 'B Nazanin', 'Tahoma', sans-serif;
+  --font-body:     'Vazirmatn', 'B Nazanin', 'Tahoma', sans-serif;
+  --font-mono:     'Roboto Mono', monospace;
+}
+
+*{ box-sizing: border-box; }
+
+html{ scroll-behavior: smooth; }
+
+body{
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(95,168,160,0.08), transparent 60%),
+    radial-gradient(900px 500px at 10% 110%, rgba(201,161,92,0.06), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  direction: rtl;
+}
+
+/* subtle blueprint grid on the deep background */
+.grid-bg{
+  background-image:
+    linear-gradient(rgba(201,161,92,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,161,92,0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+a{ color: inherit; text-decoration: none; }
+
+.wrap{
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------------- Header ---------------- */
+.site-header{
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.site-header .wrap{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-mark{
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--brass);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  flex: none;
+}
+.brand-mark::before{
+  content: '';
+  width: 4px; height: 14px;
+  background: var(--brass);
+  border-radius: 2px;
+  position: absolute;
+  transform-origin: bottom center;
+  bottom: 20px;
+  transform: rotate(35deg);
+}
+.brand-mark::after{
+  content:'';
+  width: 6px; height: 6px;
+  background: var(--teal);
+  border-radius: 50%;
+}
+.brand-text .title{
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: .5px;
+}
+.brand-text .subtitle{
+  font-size: 12px;
+  color: var(--text-faint);
+}
+.header-tag{
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 20px;
+  direction: ltr;
+}
+
+/* ---------------- Hero ---------------- */
+.hero{
+  padding: 64px 0 40px;
+}
+.eyebrow{
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--teal);
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+  direction: ltr;
+  text-align: right;
+  display: inline-block;
+}
+.hero h1{
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(30px, 5vw, 48px);
+  line-height: 1.3;
+  margin: 0 0 18px;
+}
+.hero h1 span{ color: var(--brass-bright); }
+.hero p.lead{
+  font-size: 16px;
+  color: var(--text-dim);
+  max-width: 640px;
+  margin: 0 0 8px;
+}
+.hero .uni{
+  font-size: 13px;
+  color: var(--text-faint);
+  border-right: 2px solid var(--brass-dim);
+  padding-right: 12px;
+  margin-top: 18px;
+  display: inline-block;
+}
+
+/* ---------------- Panel (riveted control-panel look) ---------------- */
+.panel{
+  background:
+    radial-gradient(circle at 14px 14px, var(--brass-dim) 0 2.5px, transparent 3px),
+    radial-gradient(circle at calc(100% - 14px) 14px, var(--brass-dim) 0 2.5px, transparent 3px),
+    radial-gradient(circle at 14px calc(100% - 14px), var(--brass-dim) 0 2.5px, transparent 3px),
+    radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), var(--brass-dim) 0 2.5px, transparent 3px),
+    linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  position: relative;
+}
+
+/* ---------------- Module grid (index) ---------------- */
+.module-grid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin: 30px 0 56px;
+}
+@media (max-width: 720px){
+  .module-grid{ grid-template-columns: 1fr; }
+}
+.module-card{
+  display: block;
+  padding: 26px;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+.module-card:hover{
+  transform: translateY(-3px);
+  border-color: var(--brass-dim);
+}
+.module-card .num{
+  font-family: var(--font-mono);
+  color: var(--text-faint);
+  font-size: 12px;
+  letter-spacing: 1px;
+  direction: ltr;
+  display: block;
+  margin-bottom: 10px;
+}
+.module-card h3{
+  font-family: var(--font-display);
+  font-size: 19px;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.module-card p{
+  font-size: 13.5px;
+  color: var(--text-dim);
+  margin: 0 0 14px;
+}
+.module-card .go{
+  font-size: 12.5px;
+  color: var(--teal);
+  font-family: var(--font-mono);
+}
+.mod-icon{
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(201,161,92,0.1);
+  border: 1px solid var(--border);
+  flex: none;
+  font-size: 17px;
+}
+
+/* ---------------- Footer ---------------- */
+.site-footer{
+  border-top: 1px solid var(--border-soft);
+  padding: 26px 0 46px;
+  margin-top: 30px;
+}
+.site-footer .wrap{
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+
+/* ---------------- Module page layout ---------------- */
+.back-link{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+}
+.back-link:hover{ color: var(--brass-bright); }
+
+.page-head{ padding: 34px 0 8px; }
+.page-head .kicker{
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--teal);
+  letter-spacing: 1.5px;
+  direction: ltr;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+.page-head h1{
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(24px, 4vw, 32px);
+  margin: 0 0 10px;
+}
+.page-head p{
+  color: var(--text-dim);
+  max-width: 680px;
+  font-size: 14.5px;
+}
+
+.calc-layout{
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 20px;
+  margin: 26px 0 20px;
+  align-items: start;
+}
+@media (max-width: 860px){
+  .calc-layout{ grid-template-columns: 1fr; }
+}
+
+.section-title{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--brass-bright);
+  margin: 0 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::before{
+  content:'';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  flex: none;
+}
+
+/* form */
+.field{ margin-bottom: 16px; }
+.field label{
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.field label .unit{
+  font-family: var(--font-mono);
+  color: var(--text-faint);
+  direction: ltr;
+}
+.field input, .field select{
+  width: 100%;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 11px 12px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  direction: ltr;
+  text-align: left;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.field select{ direction: rtl; text-align: right; font-family: var(--font-body); }
+.field input:focus, .field select:focus{
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(95,168,160,0.15);
+}
+.field .hint{
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin-top: 5px;
+}
+
+.btn{
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14.5px;
+  padding: 13px 22px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--brass-bright), var(--brass));
+  color: #1a1206;
+  width: 100%;
+  margin-top: 6px;
+  transition: filter .15s ease, transform .1s ease;
+}
+.btn:hover{ filter: brightness(1.08); }
+.btn:active{ transform: translateY(1px); }
+
+.two-col{ display:grid; grid-template-columns:1fr 1fr; gap: 14px; }
+@media (max-width:480px){ .two-col{ grid-template-columns:1fr; } }
+
+/* results panel — gauge style */
+.results-panel{ position: sticky; top: 20px; }
+.gauge-list{ display: flex; flex-direction: column; gap: 14px; }
+.gauge{
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.gauge .g-label{
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.gauge .g-value{
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--teal);
+  direction: ltr;
+}
+.gauge .g-value .g-unit{
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin-right: 4px;
+}
+.gauge.warn .g-value{ color: var(--danger); }
+.gauge.empty .g-value{ color: var(--text-faint); }
+
+.note-box{
+  margin-top: 18px;
+  border-top: 1px dashed var(--border);
+  padding-top: 16px;
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+.note-box strong{ color: var(--text-dim); }
+
+.ref-box{
+  margin-top: 40px;
+  font-size: 12.5px;
+  color: var(--text-faint);
+  line-height: 2;
+}
+.ref-box .section-title{ margin-bottom: 10px; }
+.ref-box ul{ margin: 0; padding-inline-start: 18px; }
+
+.formula{
+  font-family: var(--font-mono);
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: var(--brass-bright);
+  direction: ltr;
+  text-align: left;
+  overflow-x: auto;
+  margin: 6px 0 16px;
+}

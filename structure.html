@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سازهٔ بدنه | دریانورد</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="grid-bg">
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="title">دریانورد</div>
+        <div class="subtitle">سامانه محاسبات مهندسی دریایی</div>
+      </div>
+    </div>
+    <div class="header-tag">MODULE 04 / STRUCTURE</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">→ بازگشت به داشبورد</a>
+
+  <div class="page-head">
+    <span class="kicker">// HULL GIRDER STRENGTH</span>
+    <h1>سازهٔ بدنه</h1>
+    <p>برآورد ممان خمشی طولی موج بر اساس فرمول ساده‌شدهٔ IACS UR S11 و بررسی تنش مجاز پوستهٔ عرشه/ته‌کشتی.</p>
+  </div>
+
+  <div class="calc-layout">
+    <div class="panel">
+      <div class="section-title">۱. ضریب موج (C_w)</div>
+      <div class="formula">C_w = 10.75 − ((300−L)/100)^1.5&nbsp; برای 90≤L≤300 m</div>
+      <div class="field">
+        <label>طول کشتی (L) <span class="unit">m</span></label>
+        <input type="number" id="L" placeholder="مثلاً 140" step="any">
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۲. ممان خمشی موج (Wave Bending Moment)</div>
+      <div class="formula">M_sag = 110×C_w×L²×B×(Cb+0.7)×10⁻³ [kNm]
+M_hog = 190×C_w×L²×B×Cb×10⁻³ [kNm]</div>
+      <div class="two-col">
+        <div class="field">
+          <label>عرض کشتی (B) <span class="unit">m</span></label>
+          <input type="number" id="B" placeholder="مثلاً 20" step="any">
+        </div>
+        <div class="field">
+          <label>ضریب بلوک (Cb) <span class="unit">0–1</span></label>
+          <input type="number" id="cb" placeholder="مثلاً 0.72" step="any">
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۳. تنش پوسته</div>
+      <div class="formula">σ = M / Z</div>
+      <div class="field">
+        <label>ممان مقاومت مقطع میانی (Z) <span class="unit">m³</span></label>
+        <input type="number" id="z" placeholder="مثلاً 4.2" step="any">
+      </div>
+      <div class="field">
+        <label>تنش مجاز طبق قوانین کلاس <span class="unit">N/mm²</span></label>
+        <input type="number" id="sigmaAllow" placeholder="مثلاً 175" step="any" value="175">
+      </div>
+
+      <button class="btn" onclick="calcStructure()">محاسبه</button>
+    </div>
+
+    <div class="results-panel panel">
+      <div class="section-title">نتایج</div>
+      <div class="gauge-list">
+        <div class="gauge empty" id="g-cw">
+          <span class="g-label">ضریب موج (C_w)</span>
+          <span class="g-value">—<span class="g-unit"></span></span>
+        </div>
+        <div class="gauge empty" id="g-msag">
+          <span class="g-label">ممان خمشی سگ‌شدگی (Sagging)</span>
+          <span class="g-value">—<span class="g-unit">kNm</span></span>
+        </div>
+        <div class="gauge empty" id="g-mhog">
+          <span class="g-label">ممان خمشی هاگ‌شدگی (Hogging)</span>
+          <span class="g-value">—<span class="g-unit">kNm</span></span>
+        </div>
+        <div class="gauge empty" id="g-sigma">
+          <span class="g-label">تنش بحرانی پوسته (σ)</span>
+          <span class="g-value">—<span class="g-unit">N/mm²</span></span>
+        </div>
+      </div>
+      <div class="note-box" id="s-note">
+        <strong>توجه:</strong> این محاسبات صرفاً ممان خمشی ناشی از موج را برآورد می‌کنند و ممان آب آرام (Still Water Bending Moment) را شامل نمی‌شوند؛ برای طراحی نهایی باید هر دو مؤلفه با هم جمع شوند.
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-box">
+    <div class="section-title">منابع و مراجع</div>
+    <ul>
+      <li>IACS — Unified Requirement S11: Longitudinal Strength Standard</li>
+      <li>Hughes, O.F. — Ship Structural Analysis and Design</li>
+      <li>یادداشت‌های درسی مقاومت سازه‌های دریایی — دانشگاه علوم و فنون دریایی خرمشهر</li>
+    </ul>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>دریانورد — ماژول سازه</span>
+    <span>پروژهٔ کارشناسی</span>
+  </div>
+</footer>
+
+<script>
+function setGauge(id, value, unit, warn){
+  const el = document.getElementById(id);
+  el.classList.remove('empty','warn');
+  if(warn) el.classList.add('warn');
+  el.querySelector('.g-value').innerHTML = value + '<span class="g-unit">'+unit+'</span>';
+}
+
+function waveCoefficient(L){
+  if(L >= 90 && L <= 300){
+    return 10.75 - Math.pow((300 - L) / 100, 1.5);
+  } else if(L > 300 && L <= 350){
+    return 10.75;
+  } else if(L > 350 && L <= 500){
+    return 10.75 - Math.pow((L - 350) / 150, 1.5);
+  }
+  return null; // out of standard applicability range
+}
+
+function calcStructure(){
+  const L = parseFloat(document.getElementById('L').value);
+  const B = parseFloat(document.getElementById('B').value);
+  const cb = parseFloat(document.getElementById('cb').value);
+  const z = parseFloat(document.getElementById('z').value);
+  const sigmaAllow = parseFloat(document.getElementById('sigmaAllow').value);
+
+  let mHogKnm = null, mSagKnm = null;
+
+  if(!isNaN(L)){
+    const cw = waveCoefficient(L);
+    const note = document.getElementById('s-note');
+    if(cw === null){
+      setGauge('g-cw', 'خارج از بازه', '');
+      note.innerHTML = '<strong>هشدار:</strong> طول کشتی خارج از بازهٔ کاربرد استاندارد فرمول (۹۰ تا ۵۰۰ متر) است.';
+    } else {
+      setGauge('g-cw', cw.toFixed(3), '');
+
+      if(!isNaN(B) && !isNaN(cb)){
+        // IACS UR S11 simplified wave bending moment, result directly in kNm (L, B in m)
+        mSagKnm = 110 * cw * Math.pow(L,2) * B * (cb + 0.7) * 1e-3;
+        mHogKnm = 190 * cw * Math.pow(L,2) * B * cb * 1e-3;
+        setGauge('g-msag', mSagKnm.toFixed(0), 'kNm');
+        setGauge('g-mhog', mHogKnm.toFixed(0), 'kNm');
+      }
+    }
+  }
+
+  if(mHogKnm !== null && mSagKnm !== null && !isNaN(z) && z > 0){
+    const mMax = Math.max(mHogKnm, mSagKnm); // kNm, worst case of hogging/sagging
+    // Unit conversion: 1 kNm = 1e6 N·mm ; 1 m^3 = 1e9 mm^3
+    // sigma [N/mm2] = M[kNm] * 1e6 / (Z[m3] * 1e9) = M / (Z * 1000)
+    const sigma = mMax / (z * 1000); // N/mm2
+    const warn = sigma > sigmaAllow;
+    setGauge('g-sigma', sigma.toFixed(1), 'N/mm²', warn);
+  }
+}
+</script>
+
+</body>
+</html>

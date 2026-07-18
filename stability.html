@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پایداری شناور | دریانورد</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="grid-bg">
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="title">دریانورد</div>
+        <div class="subtitle">سامانه محاسبات مهندسی دریایی</div>
+      </div>
+    </div>
+    <div class="header-tag">MODULE 03 / STABILITY</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">→ بازگشت به داشبورد</a>
+
+  <div class="page-head">
+    <span class="kicker">// INTACT STABILITY</span>
+    <h1>پایداری شناور</h1>
+    <p>محاسبهٔ ارتفاع متاسنتریک عرضی (GM) و برآورد بازوی گرداننده (GZ) در زوایای کوچک خمش.</p>
+  </div>
+
+  <div class="calc-layout">
+    <div class="panel">
+      <div class="section-title">۱. شعاع متاسنتریک و GM</div>
+      <div class="formula">BM = I_T / ∇ &nbsp;|&nbsp; KM = KB + BM &nbsp;|&nbsp; GM = KM − KG</div>
+      <div class="two-col">
+        <div class="field">
+          <label>ممان اینرسی سطح آبخور (I_T) <span class="unit">m⁴</span></label>
+          <input type="number" id="it" placeholder="مثلاً 42000" step="any">
+        </div>
+        <div class="field">
+          <label>حجم آبران (∇) <span class="unit">m³</span></label>
+          <input type="number" id="nabla" placeholder="مثلاً 7800" step="any">
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>ارتفاع مرکز شناوری (KB) <span class="unit">m</span></label>
+          <input type="number" id="kb" placeholder="مثلاً 3.1" step="any">
+        </div>
+        <div class="field">
+          <label>ارتفاع مرکز ثقل (KG) <span class="unit">m</span></label>
+          <input type="number" id="kg" placeholder="مثلاً 6.4" step="any">
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۲. بازوی گرداننده در زاویهٔ کوچک</div>
+      <div class="formula">GZ ≈ GM × sin(θ)</div>
+      <div class="field">
+        <label>زاویهٔ خمش (θ) <span class="unit">درجه</span></label>
+        <input type="number" id="theta" placeholder="مثلاً 10" step="any">
+        <div class="hint">این تقریب فقط برای زوایای کوچک (تا حدود ۱۰–۱۵ درجه) معتبر است.</div>
+      </div>
+
+      <button class="btn" onclick="calcStability()">محاسبه</button>
+    </div>
+
+    <div class="results-panel panel">
+      <div class="section-title">نتایج</div>
+      <div class="gauge-list">
+        <div class="gauge empty" id="g-bm">
+          <span class="g-label">شعاع متاسنتریک (BM)</span>
+          <span class="g-value">—<span class="g-unit">m</span></span>
+        </div>
+        <div class="gauge empty" id="g-km">
+          <span class="g-label">ارتفاع متاسنتر (KM)</span>
+          <span class="g-value">—<span class="g-unit">m</span></span>
+        </div>
+        <div class="gauge empty" id="g-gm">
+          <span class="g-label">ارتفاع متاسنتریک (GM)</span>
+          <span class="g-value">—<span class="g-unit">m</span></span>
+        </div>
+        <div class="gauge empty" id="g-gz">
+          <span class="g-label">بازوی گرداننده (GZ)</span>
+          <span class="g-value">—<span class="g-unit">m</span></span>
+        </div>
+      </div>
+      <div class="note-box" id="gm-note">
+        <strong>ارزیابی:</strong> پس از محاسبه، وضعیت پایداری اینجا نمایش داده می‌شود.
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-box">
+    <div class="section-title">منابع و مراجع</div>
+    <ul>
+      <li>Derrett, D.R. / Barrass, C.B. — Ship Stability for Masters and Mates</li>
+      <li>IMO — International Code on Intact Stability (IS Code 2008), حداقل GM ≥ 0.15 m</li>
+      <li>یادداشت‌های درسی پایداری و تعادل شناور — دانشگاه علوم و فنون دریایی خرمشهر</li>
+    </ul>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>دریانورد — ماژول پایداری</span>
+    <span>پروژهٔ کارشناسی</span>
+  </div>
+</footer>
+
+<script>
+function setGauge(id, value, unit, warn){
+  const el = document.getElementById(id);
+  el.classList.remove('empty','warn');
+  if(warn) el.classList.add('warn');
+  el.querySelector('.g-value').innerHTML = value + '<span class="g-unit">'+unit+'</span>';
+}
+
+function calcStability(){
+  const it = parseFloat(document.getElementById('it').value);
+  const nabla = parseFloat(document.getElementById('nabla').value);
+  const kb = parseFloat(document.getElementById('kb').value);
+  const kg = parseFloat(document.getElementById('kg').value);
+  const theta = parseFloat(document.getElementById('theta').value);
+
+  let gm = null;
+
+  if(!isNaN(it) && !isNaN(nabla) && nabla > 0){
+    const bm = it / nabla;
+    setGauge('g-bm', bm.toFixed(3), 'm');
+
+    if(!isNaN(kb)){
+      const km = kb + bm;
+      setGauge('g-km', km.toFixed(3), 'm');
+
+      if(!isNaN(kg)){
+        gm = km - kg;
+        const warn = gm < 0.15;
+        setGauge('g-gm', gm.toFixed(3), 'm', warn);
+
+        const note = document.getElementById('gm-note');
+        if(gm < 0){
+          note.innerHTML = '<strong>هشدار:</strong> GM منفی است — شناور در حالت ناپایدار (کاپسایز) قرار دارد.';
+        } else if(gm < 0.15){
+          note.innerHTML = '<strong>هشدار:</strong> GM کمتر از حداقل توصیه‌شدهٔ IMO IS-Code (0.15 m) است.';
+        } else {
+          note.innerHTML = '<strong>وضعیت مطلوب:</strong> GM بالاتر از حداقل استاندارد IMO است.';
+        }
+      }
+    }
+  }
+
+  if(gm !== null && !isNaN(theta)){
+    const gz = gm * Math.sin(theta * Math.PI / 180);
+    setGauge('g-gz', gz.toFixed(3), 'm');
+  }
+}
+</script>
+
+</body>
+</html>

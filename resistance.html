@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مقاومت و پیشرانش کشتی | دریانورد</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="grid-bg">
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="title">دریانورد</div>
+        <div class="subtitle">سامانه محاسبات مهندسی دریایی</div>
+      </div>
+    </div>
+    <div class="header-tag">MODULE 02 / RESISTANCE</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">→ بازگشت به داشبورد</a>
+
+  <div class="page-head">
+    <span class="kicker">// RESISTANCE & POWERING</span>
+    <h1>مقاومت و پیشرانش کشتی</h1>
+    <p>محاسبهٔ عدد فرود، برآورد توان لازم با روش ضریب آدمیرالتی و تبدیل به توان مؤثر (EHP).</p>
+  </div>
+
+  <div class="calc-layout">
+    <div class="panel">
+      <div class="section-title">۱. عدد فرود</div>
+      <div class="formula">Fn = V / √(g × L)</div>
+      <div class="two-col">
+        <div class="field">
+          <label>سرعت شناور (V) <span class="unit">m/s</span></label>
+          <input type="number" id="v" placeholder="مثلاً 7.5" step="any">
+        </div>
+        <div class="field">
+          <label>طول در خط آب (L) <span class="unit">m</span></label>
+          <input type="number" id="lwl" placeholder="مثلاً 90" step="any">
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۲. توان با روش ضریب آدمیرالتی</div>
+      <div class="formula">P [kW] = Δ^(2/3) × V_kn^3 / C_A</div>
+      <div class="two-col">
+        <div class="field">
+          <label>وزن جابه‌جایی (Δ) <span class="unit">ton</span></label>
+          <input type="number" id="disp" placeholder="مثلاً 8000" step="any">
+        </div>
+        <div class="field">
+          <label>سرعت سرویس <span class="unit">knots</span></label>
+          <input type="number" id="vkn" placeholder="مثلاً 15" step="any">
+        </div>
+      </div>
+      <div class="field">
+        <label>ضریب آدمیرالتی (C_A) <span class="unit">—</span></label>
+        <input type="number" id="ca" placeholder="مثلاً 450 (کشتی باری متوسط)" step="any" value="450">
+        <div class="hint">بازهٔ رایج: ۴۰۰–۶۰۰ برای کشتی‌های باری؛ برای شناورهای تندرو کمتر است.</div>
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۳. توان مؤثر (EHP)</div>
+      <div class="formula">EHP = SHP × η_D</div>
+      <div class="field">
+        <label>ضریب پیشرانش کلی (η_D) <span class="unit">0–1</span></label>
+        <input type="number" id="etaD" placeholder="0.65" step="any" value="0.65">
+      </div>
+
+      <button class="btn" onclick="calcResistance()">محاسبه</button>
+    </div>
+
+    <div class="results-panel panel">
+      <div class="section-title">نتایج</div>
+      <div class="gauge-list">
+        <div class="gauge empty" id="g-fn">
+          <span class="g-label">عدد فرود (Fn)</span>
+          <span class="g-value">—<span class="g-unit"></span></span>
+        </div>
+        <div class="gauge empty" id="g-shp">
+          <span class="g-label">توان محوری برآوردی (SHP)</span>
+          <span class="g-value">—<span class="g-unit">kW</span></span>
+        </div>
+        <div class="gauge empty" id="g-ehp">
+          <span class="g-label">توان مؤثر (EHP)</span>
+          <span class="g-value">—<span class="g-unit">kW</span></span>
+        </div>
+      </div>
+      <div class="note-box" id="fn-note">
+        <strong>توجه:</strong> برای Fn بالای ۰٫۳ رژیم حرکت به سمت نیمه‌برنامه‌ای/برنامه‌ای میل می‌کند و روش ضریب آدمیرالتی دقت کمتری دارد.
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-box">
+    <div class="section-title">منابع و مراجع</div>
+    <ul>
+      <li>Lewis, E.V. (ed.) — Principles of Naval Architecture, Vol. II: Resistance, Propulsion and Vibration</li>
+      <li>Molland, Turnock, Hudson — Ship Resistance and Propulsion</li>
+      <li>یادداشت‌های درسی مقاومت و پیشرانش — دانشگاه علوم و فنون دریایی خرمشهر</li>
+    </ul>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>دریانورد — ماژول مقاومت و پیشرانش</span>
+    <span>پروژهٔ کارشناسی</span>
+  </div>
+</footer>
+
+<script>
+function setGauge(id, value, unit, warn){
+  const el = document.getElementById(id);
+  el.classList.remove('empty','warn');
+  if(warn) el.classList.add('warn');
+  el.querySelector('.g-value').innerHTML = value + '<span class="g-unit">'+unit+'</span>';
+}
+
+function calcResistance(){
+  const v = parseFloat(document.getElementById('v').value);
+  const lwl = parseFloat(document.getElementById('lwl').value);
+  const disp = parseFloat(document.getElementById('disp').value);
+  const vkn = parseFloat(document.getElementById('vkn').value);
+  const ca = parseFloat(document.getElementById('ca').value);
+  const etaD = parseFloat(document.getElementById('etaD').value);
+  const g = 9.81;
+
+  let shp = null;
+
+  // 1. Froude number
+  if(!isNaN(v) && !isNaN(lwl) && lwl > 0){
+    const fn = v / Math.sqrt(g * lwl);
+    const warn = fn > 0.3;
+    setGauge('g-fn', fn.toFixed(3), '', warn);
+    document.getElementById('fn-note').style.display = warn ? 'block' : 'none';
+  }
+
+  // 2. Admiralty coefficient power estimate
+  if(!isNaN(disp) && !isNaN(vkn) && !isNaN(ca) && ca > 0){
+    shp = Math.pow(disp, 2/3) * Math.pow(vkn, 3) / ca;
+    setGauge('g-shp', shp.toFixed(1), 'kW');
+  }
+
+  // 3. Effective horsepower
+  if(shp !== null && !isNaN(etaD) && etaD > 0){
+    const ehp = shp * etaD;
+    setGauge('g-ehp', ehp.toFixed(1), 'kW');
+  }
+}
+</script>
+
+</body>
+</html>
