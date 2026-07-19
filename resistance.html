@@ -30,7 +30,7 @@
   <div class="page-head">
     <span class="kicker">// RESISTANCE & POWERING</span>
     <h1>مقاومت و پیشرانش کشتی</h1>
-    <p>محاسبهٔ عدد فرود، برآورد توان لازم با روش ضریب آدمیرالتی و تبدیل به توان مؤثر (EHP).</p>
+    <p>محاسبهٔ عدد فرود، برآورد توان لازم با روش ضریب آدمیرالتی، تبدیل به توان مؤثر (EHP) و منحنی توان بر حسب سرعت.</p>
     <div class="page-head-actions">
       <a class="study-link" href="info/resistance.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg> مطالعه و آموزش: منابع معتبر و مقالهٔ راهنما</a>
     </div>
@@ -98,6 +98,23 @@
       <div class="note-box" id="fn-note">
         <strong>توجه:</strong> برای Fn بالای ۰٫۳ رژیم حرکت به سمت نیمه‌برنامه‌ای/برنامه‌ای میل می‌کند و روش ضریب آدمیرالتی دقت کمتری دارد.
       </div>
+
+      <div class="chart-box" id="pwrChartBox" style="display:none;">
+        <canvas id="pwrChart" height="220"></canvas>
+        <div class="chart-stats">
+          <div class="chart-stat" id="cs-fncrit">
+            <span class="cs-label">سرعت در Fn=0.3</span>
+            <span class="cs-value">—</span>
+          </div>
+          <div class="chart-stat" id="cs-svc">
+            <span class="cs-label">SHP در سرعت سرویس</span>
+            <span class="cs-value">—</span>
+          </div>
+        </div>
+        <div class="chart-note">
+          منحنی با همان روش ضریب آدمیرالتی (Δ^(2/3)·V³/C_A) در بازهٔ ۰٫۵ تا ۱٫۳ برابر سرعت سرویس رسم شده تا رشد سریع توان با سرعت — به‌ویژه نزدیک عدد فرود بحرانی (~۰٫۳) — قابل مشاهده باشد. خط عمودی، سرعتی را نشان می‌دهد که Fn به ۰٫۳ می‌رسد.
+        </div>
+      </div>
     </div>
   </div>
 
@@ -119,6 +136,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="assets/common.js"></script>
 <script>
 katex.render("Fn = \\dfrac{V}{\\sqrt{g \\times L}}", document.getElementById('f-fn'), {throwOnError:false, displayMode:true});
@@ -131,6 +149,8 @@ function setGauge(id, value, unit, warn){
   if(warn) el.classList.add('warn');
   el.querySelector('.g-value').innerHTML = value + '<span class="g-unit">'+unit+'</span>';
 }
+
+let pwrChartInstance = null;
 
 function calcResistance(){
   const v = parseFloat(document.getElementById('v').value);
@@ -162,6 +182,102 @@ function calcResistance(){
     const ehp = shp * etaD;
     setGauge('g-ehp', ehp.toFixed(1), 'kW');
   }
+
+  // 4. Power vs speed sweep chart
+  if(!isNaN(disp) && !isNaN(vkn) && !isNaN(ca) && ca > 0 && vkn > 0){
+    drawPowerChart(disp, vkn, ca, etaD, lwl);
+  }
+}
+
+function drawPowerChart(disp, vkn, ca, etaD, lwl){
+  document.getElementById('pwrChartBox').style.display = 'block';
+  const vMin = vkn * 0.5;
+  const vMax = vkn * 1.3;
+  const steps = 30;
+  const labels = [];
+  const shpData = [];
+  const ehpData = [];
+
+  for(let i = 0; i <= steps; i++){
+    const vi = vMin + (vMax - vMin) * (i / steps);
+    labels.push(vi.toFixed(1));
+    const shp_i = Math.pow(disp, 2/3) * Math.pow(vi, 3) / ca;
+    shpData.push(shp_i);
+    ehpData.push(!isNaN(etaD) && etaD > 0 ? shp_i * etaD : null);
+  }
+
+  // speed at which Fn = 0.3 (if LWL known)
+  let fnCritKn = null;
+  if(!isNaN(lwl) && lwl > 0){
+    const vFnCrit = 0.3 * Math.sqrt(9.81 * lwl); // m/s
+    fnCritKn = vFnCrit * 1.944;
+    document.getElementById('cs-fncrit').querySelector('.cs-value').textContent = fnCritKn.toFixed(1) + ' kn';
+  } else {
+    document.getElementById('cs-fncrit').querySelector('.cs-value').textContent = '—';
+  }
+  document.getElementById('cs-svc').querySelector('.cs-value').textContent =
+    (Math.pow(disp, 2/3) * Math.pow(vkn, 3) / ca).toFixed(0) + ' kW';
+
+  const annotationLine = (fnCritKn !== null && fnCritKn >= vMin && fnCritKn <= vMax)
+    ? labels.reduce((closestIdx, l, idx) => Math.abs(parseFloat(l) - fnCritKn) < Math.abs(parseFloat(labels[closestIdx]) - fnCritKn) ? idx : closestIdx, 0)
+    : null;
+
+  const ctx = document.getElementById('pwrChart').getContext('2d');
+  if(pwrChartInstance) pwrChartInstance.destroy();
+  pwrChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'SHP برآوردی',
+          data: shpData,
+          borderColor: '#d1a968',
+          backgroundColor: 'rgba(209,169,104,0.10)',
+          borderWidth: 2.5,
+          pointRadius: 0,
+          fill: true,
+          tension: 0.25
+        },
+        {
+          label: 'EHP برآوردی',
+          data: ehpData,
+          borderColor: '#4d928a',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [4,3],
+          pointRadius: 0,
+          fill: false,
+          tension: 0.25
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8a9dae', font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            title: (items) => 'V ≈ ' + items[0].label + ' kn',
+            label: (item) => item.parsed.y !== null ? (item.dataset.label + ': ' + item.parsed.y.toFixed(0) + ' kW') : null
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'سرعت شناور (knots)', color: '#576a7c', font: {size: 11} },
+          ticks: { color: '#576a7c', maxTicksLimit: 10 },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        },
+        y: {
+          title: { display: true, text: 'توان (kW)', color: '#576a7c', font: {size: 11} },
+          ticks: { color: '#576a7c' },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        }
+      }
+    }
+  });
 }
 </script>
 

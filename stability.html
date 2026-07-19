@@ -30,7 +30,7 @@
   <div class="page-head">
     <span class="kicker">// INTACT STABILITY</span>
     <h1>پایداری شناور</h1>
-    <p>محاسبهٔ ارتفاع متاسنتریک عرضی (GM) و برآورد بازوی گرداننده (GZ) در زوایای کوچک خمش.</p>
+    <p>محاسبهٔ ارتفاع متاسنتریک عرضی (GM)، منحنی کامل بازوی گرداننده (GZ) و ارزیابی نسبت به حداقل‌های IMO IS-Code.</p>
     <div class="page-head-actions">
       <a class="study-link" href="info/stability.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg> مطالعه و آموزش: منابع معتبر و مقالهٔ راهنما</a>
     </div>
@@ -50,6 +50,41 @@
           <input type="number" id="nabla" placeholder="مثلاً 7800" step="any">
         </div>
       </div>
+
+      <button type="button" class="adv-toggle" onclick="toggleAdv('adv-it')">▾ محاسبهٔ دقیق I_T از روی جدول آفست (قاعدهٔ سیمپسون)</button>
+      <div class="adv-panel hidden" id="adv-it">
+        <div class="adv-title">ورودی بالادستی‌تر: به‌جای حدس I_T، آن را از روی نیم‌عرض‌های خط آبخور در ایستگاه‌های هم‌فاصله به دست بیاورید.</div>
+        <div class="two-col">
+          <div class="field">
+            <label>طول خط آبخور (L) <span class="unit">m</span></label>
+            <input type="number" id="simpL" placeholder="مثلاً 90" step="any">
+          </div>
+          <div class="field">
+            <label>تعداد ایستگاه‌ها (فرد)</label>
+            <select id="simpN" onchange="buildOffsetTable()">
+              <option value="5">5</option>
+              <option value="7">7</option>
+              <option value="9" selected>9</option>
+              <option value="11">11</option>
+              <option value="13">13</option>
+              <option value="21">21</option>
+            </select>
+          </div>
+        </div>
+        <table class="offset-table" id="offsetTable">
+          <thead>
+            <tr><th>ایستگاه</th><th>ضریب سیمپسون</th><th>نیم‌عرض y <span class="unit">(m)</span></th></tr>
+          </thead>
+          <tbody id="offsetBody"></tbody>
+        </table>
+        <div class="field">
+          <label>عرض شناور (B) — اختیاری، برای محاسبهٔ C_WP <span class="unit">m</span></label>
+          <input type="number" id="simpB" placeholder="مثلاً 15.5" step="any">
+        </div>
+        <button class="btn-small primary" onclick="computeSimpsonIT()">محاسبهٔ Awp و I_T</button>
+        <div class="adv-result" id="simpResult">هنوز محاسبه نشده.</div>
+      </div>
+
       <div class="two-col">
         <div class="field">
           <label>ارتفاع مرکز شناوری (KB) <span class="unit">m</span></label>
@@ -61,12 +96,38 @@
         </div>
       </div>
 
-      <div class="section-title" style="margin-top:26px;">۲. بازوی گرداننده در زاویهٔ کوچک</div>
+      <button type="button" class="adv-toggle" onclick="toggleAdv('adv-kb')">▾ برآورد KB از روی ضرایب بدنه (فرمول موریش)</button>
+      <div class="adv-panel hidden" id="adv-kb">
+        <div class="adv-title">ورودی بالادستی‌تر: به‌جای حدس KB، آن را از روی آبخور و ضرایب هندسی بدنه برآورد کنید.</div>
+        <div class="formula" id="f-morrish"></div>
+        <div class="two-col">
+          <div class="field">
+            <label>آبخور (d) <span class="unit">m</span></label>
+            <input type="number" id="morD" placeholder="مثلاً 6.0" step="any">
+          </div>
+          <div class="field">
+            <label>ضریب بلوک (C_B) <span class="unit">0–1</span></label>
+            <input type="number" id="morCb" placeholder="مثلاً 0.70" step="any">
+          </div>
+        </div>
+        <div class="field">
+          <label>ضریب سطح آبخور (C_WP) <span class="unit">0–1</span></label>
+          <input type="number" id="morCwp" placeholder="مثلاً 0.82" step="any">
+        </div>
+        <button class="btn-small primary" onclick="computeMorrishKB()">محاسبهٔ KB</button>
+        <div class="adv-result" id="morrishResult">هنوز محاسبه نشده.</div>
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۲. منحنی کامل بازوی گرداننده (GZ Curve)</div>
       <div class="formula" id="f-gz"></div>
       <div class="field">
-        <label>زاویهٔ خمش (θ) <span class="unit">درجه</span></label>
+        <label>زاویهٔ خمش برای محاسبهٔ نقطهٔ خاص (θ) <span class="unit">درجه</span></label>
         <input type="number" id="theta" placeholder="مثلاً 10" step="any">
-        <div class="hint">این تقریب فقط برای زوایای کوچک (تا حدود ۱۰–۱۵ درجه) معتبر است.</div>
+      </div>
+      <div class="field">
+        <label>زاویهٔ تقریبی غرق لبهٔ عرشه <span class="unit">درجه — اختیاری</span></label>
+        <input type="number" id="deckAngle" placeholder="مثلاً 25 (پیش‌فرض)" step="any">
+        <div class="hint">فرمول دیوارهٔ‌قائم (wall-sided) فقط تا این زاویه معتبر است؛ فراتر از آن به‌صورت خط‌چین و صرفاً جهت مرجع رسم می‌شود.</div>
       </div>
 
       <button class="btn" onclick="calcStability()">محاسبه</button>
@@ -88,12 +149,37 @@
           <span class="g-value">—<span class="g-unit">m</span></span>
         </div>
         <div class="gauge empty" id="g-gz">
-          <span class="g-label">بازوی گرداننده (GZ)</span>
+          <span class="g-label">GZ در زاویهٔ θ</span>
           <span class="g-value">—<span class="g-unit">m</span></span>
         </div>
       </div>
       <div class="note-box" id="gm-note">
         <strong>ارزیابی:</strong> پس از محاسبه، وضعیت پایداری اینجا نمایش داده می‌شود.
+      </div>
+
+      <div class="chart-box" id="gzChartBox" style="display:none;">
+        <canvas id="gzChart" height="220"></canvas>
+        <div class="chart-stats">
+          <div class="chart-stat" id="cs-gzmax">
+            <span class="cs-label">بیشینهٔ GZ</span>
+            <span class="cs-value">—</span>
+          </div>
+          <div class="chart-stat" id="cs-anglemax">
+            <span class="cs-label">زاویهٔ بیشینه GZ</span>
+            <span class="cs-value">—</span>
+          </div>
+          <div class="chart-stat" id="cs-area30">
+            <span class="cs-label">سطح تا ۳۰° (IMO ≥ 0.055)</span>
+            <span class="cs-value">—</span>
+          </div>
+          <div class="chart-stat" id="cs-area40">
+            <span class="cs-label">سطح تا ۴۰° (IMO ≥ 0.09)</span>
+            <span class="cs-value">—</span>
+          </div>
+        </div>
+        <div class="chart-note">
+          منحنی با فرض «دیوارهٔ قائم» (wall-sided) رسم شده: GZ = sinθ·(GM + ½·BM·tan²θ). این فرض تا نزدیکی زاویهٔ غرق لبهٔ عرشه معتبر است؛ بخش خط‌چین صرفاً روند نظری فرمول را نشان می‌دهد و برای گواهی رسمی پایداری باید از منحنی‌های متقاطع واقعی (KN curves) بر پایهٔ هیدرواستاتیک کامل بدنه استفاده شود. آستانه‌های سطح زیر منحنی مطابق IMO IS-Code 2008 آورده شده‌اند.
+        </div>
       </div>
     </div>
   </div>
@@ -111,15 +197,17 @@
 <footer class="site-footer">
   <div class="wrap">
     <span>ماشین‌حساب مهندسی دریا</span>
-    <span>تهیه شده توسط مهندس علیرضا خدری - دانشگاه علوم و فنون دریایی خرمشهر</span>
+    <span>ساخته شده توسط مهندس علیرضا خدری - دانشگاه علوم و فنون دریایی خرمشهر</span>
   </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="assets/common.js"></script>
 <script>
 katex.render("BM=\\dfrac{I_T}{\\nabla}\\qquad KM=KB+BM\\qquad GM=KM-KG", document.getElementById('f-gm'), {throwOnError:false, displayMode:true});
-katex.render("GZ \\approx GM \\times \\sin(\\theta)", document.getElementById('f-gz'), {throwOnError:false, displayMode:true});
+katex.render("GZ(\\theta) = \\sin\\theta \\left(GM + \\dfrac{1}{2}\\,BM\\,\\tan^{2}\\theta\\right)", document.getElementById('f-gz'), {throwOnError:false, displayMode:true});
+katex.render("KB \\approx \\dfrac{d}{3}\\left(\\dfrac{5}{2} - \\dfrac{C_B}{C_{WP}}\\right)", document.getElementById('f-morrish'), {throwOnError:false, displayMode:true});
 
 function setGauge(id, value, unit, warn){
   const el = document.getElementById(id);
@@ -128,17 +216,93 @@ function setGauge(id, value, unit, warn){
   el.querySelector('.g-value').innerHTML = value + '<span class="g-unit">'+unit+'</span>';
 }
 
+function toggleAdv(id){
+  document.getElementById(id).classList.toggle('hidden');
+}
+
+/* ---------- Simpson's Rule: waterplane area & I_T from half-breadths ---------- */
+function buildOffsetTable(){
+  const n = parseInt(document.getElementById('simpN').value, 10);
+  const body = document.getElementById('offsetBody');
+  body.innerHTML = '';
+  for(let i = 0; i < n; i++){
+    let mult;
+    if(i === 0 || i === n - 1) mult = 1;
+    else mult = (i % 2 === 1) ? 4 : 2;
+    const label = (i === 0) ? 'AP (عقب)' : (i === n - 1) ? 'FP (جلو)' : ('ایستگاه ' + i);
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + label + '</td><td class="st-mult">' + mult + '</td>' +
+      '<td><input type="number" step="any" class="offset-y" placeholder="0.0"></td>';
+    body.appendChild(tr);
+  }
+}
+buildOffsetTable();
+
+function computeSimpsonIT(){
+  const L = parseFloat(document.getElementById('simpL').value);
+  const n = parseInt(document.getElementById('simpN').value, 10);
+  const ys = Array.from(document.querySelectorAll('.offset-y')).map(inp => parseFloat(inp.value));
+  const B = parseFloat(document.getElementById('simpB').value);
+  const result = document.getElementById('simpResult');
+
+  if(isNaN(L) || L <= 0 || ys.some(y => isNaN(y))){
+    result.innerHTML = 'لطفاً L و همهٔ نیم‌عرض‌ها را کامل وارد کنید.';
+    return;
+  }
+  const h = L / (n - 1);
+  let sumA = 0, sumI = 0;
+  for(let i = 0; i < n; i++){
+    let mult = (i === 0 || i === n - 1) ? 1 : (i % 2 === 1 ? 4 : 2);
+    sumA += mult * ys[i];
+    sumI += mult * Math.pow(ys[i], 3);
+  }
+  const Awp = (2 * h / 3) * sumA;
+  const IT = (2 * h / 9) * sumI;
+
+  document.getElementById('it').value = IT.toFixed(1);
+
+  let extra = '';
+  if(!isNaN(B) && B > 0){
+    const cwp = Awp / (L * B);
+    extra = ' | C_WP ≈ <strong>' + cwp.toFixed(3) + '</strong>';
+    const cwpField = document.getElementById('morCwp');
+    if(cwpField && !cwpField.value) cwpField.value = cwp.toFixed(3);
+  }
+  result.innerHTML = 'A_wp ≈ <strong>' + Awp.toFixed(1) + ' m²</strong> | I_T ≈ <strong>' + IT.toFixed(1) + ' m⁴</strong>' + extra + '<br>مقدار I_T به‌طور خودکار در فیلد بالا جایگزین شد.';
+}
+
+/* ---------- Morrish formula for KB ---------- */
+function computeMorrishKB(){
+  const d = parseFloat(document.getElementById('morD').value);
+  const cb = parseFloat(document.getElementById('morCb').value);
+  const cwp = parseFloat(document.getElementById('morCwp').value);
+  const result = document.getElementById('morrishResult');
+
+  if(isNaN(d) || isNaN(cb) || isNaN(cwp) || cwp <= 0){
+    result.innerHTML = 'لطفاً d ،C_B و C_WP را کامل وارد کنید.';
+    return;
+  }
+  const kb = (d / 3) * (2.5 - cb / cwp);
+  document.getElementById('kb').value = kb.toFixed(3);
+  result.innerHTML = 'KB ≈ <strong>' + kb.toFixed(3) + ' m</strong> (تقریب موریش — این مقدار به‌طور خودکار در فیلد KB بالا جایگزین شد.)';
+}
+
+/* ---------- Main stability calc + GZ curve chart ---------- */
+let gzChartInstance = null;
+
 function calcStability(){
   const it = parseFloat(document.getElementById('it').value);
   const nabla = parseFloat(document.getElementById('nabla').value);
   const kb = parseFloat(document.getElementById('kb').value);
   const kg = parseFloat(document.getElementById('kg').value);
   const theta = parseFloat(document.getElementById('theta').value);
+  const deckAngleInput = parseFloat(document.getElementById('deckAngle').value);
+  const deckAngle = isNaN(deckAngleInput) ? 25 : deckAngleInput;
 
-  let gm = null;
+  let gm = null, bm = null;
 
   if(!isNaN(it) && !isNaN(nabla) && nabla > 0){
-    const bm = it / nabla;
+    bm = it / nabla;
     setGauge('g-bm', bm.toFixed(3), 'm');
 
     if(!isNaN(kb)){
@@ -162,10 +326,131 @@ function calcStability(){
     }
   }
 
-  if(gm !== null && !isNaN(theta)){
-    const gz = gm * Math.sin(theta * Math.PI / 180);
+  function gzOf(angleDeg, GM, BM){
+    const rad = angleDeg * Math.PI / 180;
+    return Math.sin(rad) * (GM + 0.5 * BM * Math.pow(Math.tan(rad), 2));
+  }
+
+  if(gm !== null && bm !== null && !isNaN(theta)){
+    const gz = gzOf(theta, gm, bm);
     setGauge('g-gz', gz.toFixed(3), 'm');
   }
+
+  if(gm !== null && bm !== null){
+    drawGZChart(gm, bm, deckAngle, gzOf);
+  }
+}
+
+function drawGZChart(gm, bm, deckAngle, gzOf){
+  document.getElementById('gzChartBox').style.display = 'block';
+  const maxAngle = 60;
+  const step = 1;
+  const labels = [];
+  const solidData = [];
+  const dashedData = [];
+  let gzmax = -Infinity, angleMax = 0;
+
+  for(let a = 0; a <= maxAngle; a += step){
+    const gz = gzOf(a, gm, bm);
+    labels.push(a);
+    if(a <= deckAngle){
+      solidData.push(gz);
+      dashedData.push(null);
+    } else {
+      solidData.push(null);
+      dashedData.push(gz);
+    }
+    if(a <= deckAngle && gz > gzmax){ gzmax = gz; angleMax = a; }
+  }
+  // connect the dashed segment to the solid line's last point
+  const deckIdx = Math.round(deckAngle / step);
+  if(deckIdx >= 0 && deckIdx < dashedData.length){ dashedData[deckIdx] = gzOf(deckAngle, gm, bm); }
+
+  // numerical integration (trapezoid, in radians) for area under curve up to 30 and 40 deg
+  function areaTo(angleLimit){
+    let area = 0;
+    const dRad = step * Math.PI / 180;
+    let prev = gzOf(0, gm, bm);
+    for(let a = step; a <= angleLimit; a += step){
+      const cur = gzOf(a, gm, bm);
+      area += (prev + cur) / 2 * dRad;
+      prev = cur;
+    }
+    return area;
+  }
+  const area30 = areaTo(30);
+  const area40 = areaTo(40);
+
+  document.getElementById('cs-gzmax').querySelector('.cs-value').textContent = gzmax.toFixed(3) + ' m';
+  document.getElementById('cs-anglemax').querySelector('.cs-value').textContent = angleMax.toFixed(0) + '°';
+
+  const el30 = document.getElementById('cs-area30');
+  el30.querySelector('.cs-value').textContent = area30.toFixed(4) + ' m·rad';
+  el30.classList.remove('good','bad');
+  el30.classList.add(area30 >= 0.055 ? 'good' : 'bad');
+
+  const el40 = document.getElementById('cs-area40');
+  el40.querySelector('.cs-value').textContent = area40.toFixed(4) + ' m·rad';
+  el40.classList.remove('good','bad');
+  el40.classList.add(area40 >= 0.09 ? 'good' : 'bad');
+
+  const ctx = document.getElementById('gzChart').getContext('2d');
+  if(gzChartInstance) gzChartInstance.destroy();
+  gzChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'GZ (معتبر تا زاویهٔ غرق عرشه)',
+          data: solidData,
+          borderColor: '#4d928a',
+          backgroundColor: 'rgba(77,146,138,0.12)',
+          borderWidth: 2.5,
+          pointRadius: 0,
+          fill: true,
+          tension: 0.15,
+          spanGaps: false
+        },
+        {
+          label: 'ادامهٔ نظری (خارج از فرض دیوارهٔ‌قائم)',
+          data: dashedData,
+          borderColor: '#8a9dae',
+          borderDash: [5,4],
+          borderWidth: 1.8,
+          pointRadius: 0,
+          fill: false,
+          tension: 0.15,
+          spanGaps: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8a9dae', font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            title: (items) => 'θ = ' + items[0].label + '°',
+            label: (item) => item.dataset.label + ': ' + (item.parsed.y !== null ? item.parsed.y.toFixed(3) + ' m' : '—')
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'زاویهٔ خمش θ (درجه)', color: '#576a7c', font: {size: 11} },
+          ticks: { color: '#576a7c', maxTicksLimit: 13 },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        },
+        y: {
+          title: { display: true, text: 'GZ (m)', color: '#576a7c', font: {size: 11} },
+          ticks: { color: '#576a7c' },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        }
+      }
+    }
+  });
 }
 </script>
 

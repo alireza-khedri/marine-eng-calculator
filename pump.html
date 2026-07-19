@@ -30,7 +30,7 @@
   <div class="page-head">
     <span class="kicker">// PUMPS & PIPING SYSTEMS</span>
     <h1>پمپ و لوله‌کشی</h1>
-    <p>محاسبهٔ سرعت سیال، افت فشار خط لوله (دارسی-وایسباخ)، NPSH موجود و توان لازم پمپ.</p>
+    <p>محاسبهٔ سرعت سیال، افت فشار خط لوله (دارسی-وایسباخ)، NPSH موجود، نقطهٔ کار واقعی سیستم و توان لازم پمپ.</p>
     <div class="page-head-actions">
       <a class="study-link" href="info/pump.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg> مطالعه و آموزش: منابع معتبر و مقالهٔ راهنما</a>
     </div>
@@ -64,6 +64,25 @@
         </div>
       </div>
 
+      <button type="button" class="adv-toggle" onclick="toggleAdv('adv-f')">▾ محاسبهٔ ضریب اصطکاک از روی زبری لوله و عدد رینولدز (سوامی-جین)</button>
+      <div class="adv-panel hidden" id="adv-f">
+        <div class="adv-title">ورودی بالادستی‌تر: به‌جای حدس f، آن را از روی جنس لوله (زبری) و شرایط جریان (رینولدز) به دست بیاورید.</div>
+        <div class="formula" id="f-swamee"></div>
+        <div class="two-col">
+          <div class="field">
+            <label>زبری مطلق لوله (ε) <span class="unit">mm</span></label>
+            <input type="number" id="rough" placeholder="0.045 (فولاد تجاری نو)" step="any" value="0.045">
+          </div>
+          <div class="field">
+            <label>ویسکوزیتهٔ سینماتیک سیال (ν) <span class="unit">×10⁻⁶ m²/s</span></label>
+            <input type="number" id="visc" placeholder="1.0 (آب شیرین 20°C)" step="any" value="1.0">
+          </div>
+        </div>
+        <div class="hint">راهنما: آب دریا ≈ 1.05×10⁻⁶، آب شیرین 20°C ≈ 1.0×10⁻⁶، فولاد ضدزنگ نو ≈ 0.015 mm، فولاد کربنی معمولی ≈ 0.045 mm، لولهٔ کارکرده/خورده ≈ 0.15–0.3 mm.</div>
+        <button class="btn-small primary" onclick="computeFrictionFactor()">محاسبهٔ Re و f</button>
+        <div class="adv-result" id="fResult">هنوز محاسبه نشده. ابتدا Q و D را در بخش ۱ وارد کنید.</div>
+      </div>
+
       <div class="section-title" style="margin-top:26px;">۳. NPSH موجود</div>
       <div class="formula" id="f-npsh"></div>
       <div class="two-col">
@@ -87,12 +106,40 @@
         </div>
       </div>
 
-      <div class="section-title" style="margin-top:26px;">۴. توان لازم پمپ</div>
+      <div class="section-title" style="margin-top:26px;">۴. منحنی سیستم و منحنی پمپ — یافتن نقطهٔ کار</div>
+      <div class="hint" style="margin-bottom:14px;">
+        به‌جای وارد کردن مستقیم هد پمپ (H)، منحنی مشخصهٔ پمپ (از کاتالوگ سازنده) و منحنی سیستم لوله‌کشی (از بخش‌های ۱ و ۲) با هم تلاقی داده می‌شوند تا نقطهٔ کار واقعی به دست بیاید.
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>ارتفاع استاتیک کل سیستم (Δz) <span class="unit">m</span></label>
+          <input type="number" id="dz" placeholder="مثلاً 8 (اختلاف تراز مخزن مقصد و مبدأ)" step="any">
+        </div>
+        <div class="field">
+          <label>هد در دبی صفر — Shut-off (H₀) <span class="unit">m</span></label>
+          <input type="number" id="h0" placeholder="مثلاً 42" step="any">
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>دبی نامی پمپ (Q_r) <span class="unit">m³/h</span></label>
+          <input type="number" id="qr" placeholder="مثلاً 130" step="any">
+        </div>
+        <div class="field">
+          <label>هد در دبی نامی (H_r) <span class="unit">m</span></label>
+          <input type="number" id="hr" placeholder="مثلاً 28" step="any">
+        </div>
+      </div>
+      <div class="formula" id="f-syscurve"></div>
+      <button class="btn-small primary" onclick="computeOperatingPoint()">رسم منحنی‌ها و یافتن نقطهٔ کار</button>
+      <div class="adv-result" id="opResult" style="margin-top:12px;">هنوز محاسبه نشده.</div>
+
+      <div class="section-title" style="margin-top:26px;">۵. توان لازم پمپ</div>
       <div class="formula" id="f-power"></div>
       <div class="two-col">
         <div class="field">
           <label>هد کل پمپ (H) <span class="unit">m</span></label>
-          <input type="number" id="head" placeholder="مثلاً 25" step="any">
+          <input type="number" id="head" placeholder="مثلاً 25 (یا از بخش ۴)" step="any">
         </div>
         <div class="field">
           <label>بازده پمپ (η) <span class="unit">0–1</span></label>
@@ -126,6 +173,23 @@
       <div class="note-box" id="v-note">
         <strong>توجه:</strong> سرعت سیال در خطوط مکش معمولاً باید زیر ۲ m/s و در خطوط تخلیه بین ۲ تا ۳٫۵ m/s نگه داشته شود تا از کاویتاسیون و افت فشار زیاد جلوگیری شود.
       </div>
+
+      <div class="chart-box" id="pumpChartBox" style="display:none;">
+        <canvas id="pumpChart" height="220"></canvas>
+        <div class="chart-stats">
+          <div class="chart-stat" id="cs-qop">
+            <span class="cs-label">دبی نقطهٔ کار</span>
+            <span class="cs-value">—</span>
+          </div>
+          <div class="chart-stat" id="cs-hop">
+            <span class="cs-label">هد نقطهٔ کار</span>
+            <span class="cs-value">—</span>
+          </div>
+        </div>
+        <div class="chart-note">
+          نقطهٔ کار واقعی جایی است که منحنی سیستم (افت استاتیک + اصطکاکی، وابسته به Q²) منحنی مشخصهٔ پمپ را قطع می‌کند. مقادیر Q و H این نقطه به‌طور خودکار در فیلدهای بخش ۱ و ۵ جایگزین شدند.
+        </div>
+      </div>
     </div>
   </div>
 
@@ -147,11 +211,14 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="assets/common.js"></script>
 <script>
 katex.render("V = \\dfrac{Q}{A} \\qquad A = \\dfrac{\\pi D^{2}}{4}", document.getElementById('f-v'), {throwOnError:false, displayMode:true});
 katex.render("h_f = f \\, \\dfrac{L}{D} \\, \\dfrac{V^{2}}{2g}", document.getElementById('f-hf'), {throwOnError:false, displayMode:true});
+katex.render("Re = \\dfrac{V D}{\\nu} \\qquad f = \\dfrac{0.25}{\\left[\\log_{10}\\left(\\dfrac{\\varepsilon}{3.7D} + \\dfrac{5.74}{Re^{0.9}}\\right)\\right]^{2}}", document.getElementById('f-swamee'), {throwOnError:false, displayMode:true});
 katex.render("NPSH_a = \\dfrac{P_{atm}-P_{vap}}{\\rho g} + h_s - h_f", document.getElementById('f-npsh'), {throwOnError:false, displayMode:true});
+katex.render("H_{sys}(Q) = \\Delta z + K Q^{2} \\qquad H_{pump}(Q) = H_0 - (H_0-H_r)\\left(\\dfrac{Q}{Q_r}\\right)^{2}", document.getElementById('f-syscurve'), {throwOnError:false, displayMode:true});
 katex.render("P = \\dfrac{\\rho \\, g \\, Q \\, H}{\\eta}", document.getElementById('f-power'), {throwOnError:false, displayMode:true});
 
 function setGauge(id, value, unit, warn){
@@ -161,7 +228,42 @@ function setGauge(id, value, unit, warn){
   el.querySelector('.g-value').innerHTML = value + '<span class="g-unit">'+unit+'</span>';
 }
 
+function toggleAdv(id){
+  document.getElementById(id).classList.toggle('hidden');
+}
+
 let vGlobal = null, hfGlobal = null;
+
+/* ---------- Swamee-Jain friction factor from roughness + Reynolds ---------- */
+function computeFrictionFactor(){
+  const q = parseFloat(document.getElementById('q').value);
+  const dmm = parseFloat(document.getElementById('dmm').value);
+  const roughMm = parseFloat(document.getElementById('rough').value);
+  const viscE6 = parseFloat(document.getElementById('visc').value);
+  const result = document.getElementById('fResult');
+
+  if(isNaN(q) || isNaN(dmm) || dmm <= 0 || isNaN(roughMm) || isNaN(viscE6) || viscE6 <= 0){
+    result.innerHTML = 'لطفاً Q، D (بخش ۱) و زبری/ویسکوزیته را کامل وارد کنید.';
+    return;
+  }
+  const dM = dmm / 1000;
+  const qM3s = q / 3600;
+  const area = Math.PI * Math.pow(dM, 2) / 4;
+  const v = qM3s / area;
+  const nu = viscE6 * 1e-6;
+  const re = (v * dM) / nu;
+  const epsOverD = (roughMm / 1000) / dM;
+
+  let msg;
+  if(re < 4000){
+    msg = 'Re ≈ <strong>' + re.toFixed(0) + '</strong> — جریان آرام/انتقالی است؛ فرمول سوامی-جین (که برای جریان آشفته کامل معتبر است) اینجا دقت کافی ندارد.';
+    result.innerHTML = msg;
+    return;
+  }
+  const f = 0.25 / Math.pow(Math.log10(epsOverD/3.7 + 5.74/Math.pow(re, 0.9)), 2);
+  document.getElementById('fric').value = f.toFixed(5);
+  result.innerHTML = 'Re ≈ <strong>' + re.toFixed(0) + '</strong> | ε/D ≈ ' + epsOverD.toExponential(2) + ' | f ≈ <strong>' + f.toFixed(5) + '</strong> (سوامی-جین، معادل کولبروک-وایت)<br>مقدار f به‌طور خودکار در فیلد بخش ۲ جایگزین شد.';
+}
 
 function calcPump(){
   const q = parseFloat(document.getElementById('q').value); // m3/h
@@ -207,6 +309,128 @@ function calcPump(){
     const powerKw = (rho*g*qM3s*head)/(etaPump*1000);
     setGauge('g-power', powerKw.toFixed(2), 'kW');
   }
+}
+
+/* ---------- System curve vs pump curve -> operating point ---------- */
+let pumpChartInstance = null;
+
+function computeOperatingPoint(){
+  const dmm = parseFloat(document.getElementById('dmm').value);
+  const fric = parseFloat(document.getElementById('fric').value);
+  const lpipe = parseFloat(document.getElementById('lpipe').value);
+  const dz = parseFloat(document.getElementById('dz').value);
+  const h0 = parseFloat(document.getElementById('h0').value);
+  const qr = parseFloat(document.getElementById('qr').value);
+  const hr = parseFloat(document.getElementById('hr').value);
+  const result = document.getElementById('opResult');
+
+  if([dmm, fric, lpipe, dz, h0, qr, hr].some(isNaN) || dmm <= 0 || qr <= 0){
+    result.innerHTML = 'لطفاً D، f، L (بخش ۱ و ۲) و Δz، H₀، Q_r، H_r (بخش ۴) را کامل وارد کنید.';
+    return;
+  }
+  const g = 9.81;
+  const dM = dmm / 1000;
+  const area = Math.PI * Math.pow(dM, 2) / 4;
+  // K such that h_f[m] = K * (Q[m3/h])^2
+  const K = (fric * lpipe) / (dM * Math.pow(area, 2) * 2 * g * Math.pow(3600, 2));
+  const slopePump = (h0 - hr) / Math.pow(qr, 2); // H_pump(Q) = h0 - slopePump*Q^2
+
+  const denom = K + slopePump;
+  const numer = h0 - dz;
+  if(denom <= 0 || numer <= 0){
+    result.innerHTML = 'با این مقادیر، منحنی‌ها در بازهٔ منطقی (Q>0) یکدیگر را قطع نمی‌کنند. مقادیر Δz، H₀ یا نقطهٔ نامی را بازبینی کنید.';
+    return;
+  }
+  const qOp = Math.sqrt(numer / denom);
+  const hOp = dz + K * Math.pow(qOp, 2);
+
+  document.getElementById('q').value = qOp.toFixed(1);
+  document.getElementById('head').value = hOp.toFixed(2);
+
+  result.innerHTML = 'نقطهٔ کار: Q ≈ <strong>' + qOp.toFixed(1) + ' m³/h</strong>، H ≈ <strong>' + hOp.toFixed(2) + ' m</strong> — این مقادیر در فیلدهای Q (بخش ۱) و H (بخش ۵) جایگزین شدند؛ برای اعمال کامل روی نتایج، دکمهٔ «محاسبه» را بزنید.';
+
+  drawPumpChart(K, dz, h0, slopePump, qr, qOp, hOp);
+}
+
+function drawPumpChart(K, dz, h0, slopePump, qr, qOp, hOp){
+  document.getElementById('pumpChartBox').style.display = 'block';
+  document.getElementById('cs-qop').querySelector('.cs-value').textContent = qOp.toFixed(1) + ' m³/h';
+  document.getElementById('cs-hop').querySelector('.cs-value').textContent = hOp.toFixed(2) + ' m';
+
+  const qMax = Math.max(qr * 1.4, qOp * 1.3);
+  const steps = 40;
+  const labels = [];
+  const sysData = [];
+  const pumpData = [];
+  for(let i = 0; i <= steps; i++){
+    const q = (qMax / steps) * i;
+    labels.push(q.toFixed(0));
+    sysData.push(dz + K * q * q);
+    pumpData.push(Math.max(h0 - slopePump * q * q, 0));
+  }
+
+  const ctx = document.getElementById('pumpChart').getContext('2d');
+  if(pumpChartInstance) pumpChartInstance.destroy();
+  pumpChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'منحنی سیستم (H_sys)',
+          data: sysData,
+          borderColor: '#4d928a',
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
+          pointRadius: 0,
+          tension: 0.1
+        },
+        {
+          label: 'منحنی مشخصهٔ پمپ (H_pump)',
+          data: pumpData,
+          borderColor: '#d1a968',
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
+          pointRadius: 0,
+          tension: 0.1
+        },
+        {
+          label: 'نقطهٔ کار',
+          data: labels.map(l => (Math.abs(parseFloat(l) - qOp) < (qMax/steps)) ? hOp : null),
+          borderColor: '#e8ecef',
+          backgroundColor: '#e8ecef',
+          pointRadius: 6,
+          pointHoverRadius: 7,
+          showLine: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8a9dae', font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            title: (items) => 'Q ≈ ' + items[0].label + ' m³/h',
+            label: (item) => item.parsed.y !== null ? (item.dataset.label + ': ' + item.parsed.y.toFixed(2) + ' m') : null
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'دبی Q (m³/h)', color: '#576a7c', font: {size: 11} },
+          ticks: { color: '#576a7c', maxTicksLimit: 10 },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        },
+        y: {
+          title: { display: true, text: 'هد H (m)', color: '#576a7c', font: {size: 11} },
+          ticks: { color: '#576a7c' },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        }
+      }
+    }
+  });
 }
 </script>
 

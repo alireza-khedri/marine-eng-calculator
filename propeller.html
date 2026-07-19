@@ -56,6 +56,28 @@
         <input type="number" id="d" placeholder="مثلاً 4.2" step="any">
       </div>
 
+      <button type="button" class="adv-toggle" onclick="toggleAdv('adv-va')">▾ محاسبهٔ V_A از روی سرعت شناور و ضریب برخاست (Taylor)</button>
+      <div class="adv-panel hidden" id="adv-va">
+        <div class="adv-title">ورودی بالادستی‌تر: به‌جای حدس مستقیم V_A، آن را از سرعت واقعی شناور و ضریب برخاست (wake fraction) به دست بیاورید.</div>
+        <div class="formula" id="f-wake"></div>
+        <div class="two-col">
+          <div class="field">
+            <label>سرعت شناور (V_S) <span class="unit">m/s</span></label>
+            <input type="number" id="vs" placeholder="مثلاً 7.0" step="any">
+          </div>
+          <div class="field">
+            <label>ضریب بلوک (C_B) — برای برآورد w <span class="unit">0–1</span></label>
+            <input type="number" id="cbWake" placeholder="مثلاً 0.70" step="any">
+          </div>
+        </div>
+        <div class="field">
+          <label>ضریب برخاست (w) — اختیاری، اگر خالی بماند از C_B برآورد می‌شود <span class="unit">0–1</span></label>
+          <input type="number" id="wManual" placeholder="مثلاً 0.30" step="any">
+        </div>
+        <button class="btn-small primary" onclick="computeWakeVA()">محاسبهٔ V_A</button>
+        <div class="adv-result" id="wakeResult">هنوز محاسبه نشده. تک‌پیچ فرض شده؛ فرمول w ≈ 0.5C_B − 0.05 یک برآورد اولیهٔ تجربی است، نه جایگزین آزمایش مدل.</div>
+      </div>
+
       <div class="section-title" style="margin-top:26px;">۲. ضرایب تراست، گشتاور و بازده</div>
       <div class="formula" id="f-kt"></div>
       <div class="two-col">
@@ -146,6 +168,37 @@
 <script src="assets/common.js"></script>
 <script>
 katex.render("J = \\dfrac{V_A}{n \\times D}", document.getElementById('f-j'), {throwOnError:false, displayMode:true});
+katex.render("w \\approx 0.5\\,C_B - 0.05 \\qquad V_A = V_S\\,(1-w)", document.getElementById('f-wake'), {throwOnError:false, displayMode:true});
+
+function toggleAdv(id){
+  document.getElementById(id).classList.toggle('hidden');
+}
+
+function computeWakeVA(){
+  const vs = parseFloat(document.getElementById('vs').value);
+  const cb = parseFloat(document.getElementById('cbWake').value);
+  const wManual = parseFloat(document.getElementById('wManual').value);
+  const result = document.getElementById('wakeResult');
+
+  if(isNaN(vs)){
+    result.innerHTML = 'لطفاً سرعت شناور (V_S) را وارد کنید.';
+    return;
+  }
+  let w, source;
+  if(!isNaN(wManual)){
+    w = wManual;
+    source = 'مقدار دستی';
+  } else if(!isNaN(cb)){
+    w = 0.5 * cb - 0.05;
+    source = 'برآورد از C_B (فرمول تیلور — تک‌پیچ)';
+  } else {
+    result.innerHTML = 'لطفاً یا ضریب برخاست (w) را مستقیم بدهید، یا C_B را برای برآورد آن وارد کنید.';
+    return;
+  }
+  const va = vs * (1 - w);
+  document.getElementById('va').value = va.toFixed(3);
+  result.innerHTML = 'w ≈ <strong>' + w.toFixed(3) + '</strong> (' + source + ') → V_A ≈ <strong>' + va.toFixed(3) + ' m/s</strong><br>این مقدار به‌طور خودکار در فیلد V_A بالا جایگزین شد.';
+}
 katex.render("K_T = \\dfrac{T}{\\rho \\, n^{2} D^{4}} \\qquad K_Q = \\dfrac{Q}{\\rho \\, n^{2} D^{5}} \\qquad \\eta_O = \\dfrac{J}{2\\pi}\\cdot\\dfrac{K_T}{K_Q}", document.getElementById('f-kt'), {throwOnError:false, displayMode:true});
 katex.render("P_D = 2\\pi \\, n \\, Q", document.getElementById('f-pd'), {throwOnError:false, displayMode:true});
 katex.render("B_P = \\dfrac{N\\sqrt{P_D}}{V_A^{2.5}} \\qquad \\delta = \\dfrac{N \\times D}{V_A}", document.getElementById('f-bpd'), {throwOnError:false, displayMode:true});
