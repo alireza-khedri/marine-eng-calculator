@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بویلر کمکی | دریانورد</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body class="grid-bg">
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="title">دریانورد</div>
+        <div class="subtitle">سامانه محاسبات مهندسی دریایی</div>
+      </div>
+    </div>
+    <div class="header-nav">
+      <a class="nav-link" href="keyboard.html">🔤 نمادها</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">→ بازگشت به داشبورد</a>
+
+  <div class="page-head">
+    <span class="kicker">// AUXILIARY BOILER</span>
+    <h1>بویلر کمکی</h1>
+    <p>محاسبهٔ بار حرارتی تولید بخار، مصرف سوخت لازم و بازده احتراق بویلر کمکی کشتی.</p>
+  </div>
+
+  <div class="calc-layout">
+    <div class="panel">
+      <div class="section-title">۱. بار حرارتی تولید بخار</div>
+      <div class="formula" id="f-qb"></div>
+      <div class="two-col">
+        <div class="field">
+          <label>دبی جرمی بخار (ṁ_s) <span class="unit">kg/h</span></label>
+          <input type="number" id="msteam" placeholder="مثلاً 1500" step="any">
+        </div>
+        <div class="field">
+          <label>آنتالپی بخار تولیدی (h_s) <span class="unit">kJ/kg</span></label>
+          <input type="number" id="hsteam" placeholder="مثلاً 2765 (بخار اشباع 8bar)" step="any" value="2765">
+        </div>
+      </div>
+      <div class="field">
+        <label>آنتالپی آب تغذیه (h_fw) <span class="unit">kJ/kg</span></label>
+        <input type="number" id="hfw" placeholder="مثلاً 335 (آب 80°C)" step="any" value="335">
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۲. مصرف سوخت</div>
+      <div class="formula" id="f-fuel"></div>
+      <div class="two-col">
+        <div class="field">
+          <label>ارزش حرارتی سوخت (LHV) <span class="unit">kJ/kg</span></label>
+          <input type="number" id="lhv" placeholder="42700 (HFO)" step="any" value="42700">
+        </div>
+        <div class="field">
+          <label>بازده احتراق بویلر (η) <span class="unit">0–1</span></label>
+          <input type="number" id="etaBoiler" placeholder="0.85" step="any" value="0.85">
+        </div>
+      </div>
+
+      <button class="btn" onclick="calcBoiler()">محاسبه</button>
+    </div>
+
+    <div class="results-panel panel">
+      <div class="section-title">نتایج</div>
+      <div class="gauge-list">
+        <div class="gauge empty" id="g-qb">
+          <span class="g-label">بار حرارتی بویلر</span>
+          <span class="g-value">—<span class="g-unit">kW</span></span>
+        </div>
+        <div class="gauge empty" id="g-fuel">
+          <span class="g-label">مصرف سوخت</span>
+          <span class="g-value">—<span class="g-unit">kg/h</span></span>
+        </div>
+      </div>
+      <div class="note-box">
+        <strong>توجه:</strong> آنتالپی بخار و آب تغذیه باید از جدول بخار اشباع (Steam Tables) بر اساس فشار و دمای عملیاتی واقعی بویلر استخراج شوند؛ مقادیر پیش‌فرض فقط نمونه‌اند.
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-box">
+    <div class="section-title">منابع و مراجع</div>
+    <ul>
+      <li>Woodyard, D. — Pounder's Marine Diesel Engines and Gas Turbines (فصل بویلرهای کمکی)</li>
+      <li>Cengel, Y.A. — Thermodynamics: An Engineering Approach (جداول بخار)</li>
+      <li>یادداشت‌های درسی ترمودینامیک و بویلر — دانشگاه علوم و فنون دریایی خرمشهر</li>
+    </ul>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>دریانورد — ماژول بویلر کمکی</span>
+    <span>پروژهٔ کارشناسی</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="assets/common.js"></script>
+<script>
+katex.render("Q_b = \\dot{m}_s \\, (h_s - h_{fw})", document.getElementById('f-qb'), {throwOnError:false, displayMode:true});
+katex.render("\\dot{m}_{fuel} = \\dfrac{Q_b}{LHV \\times \\eta}", document.getElementById('f-fuel'), {throwOnError:false, displayMode:true});
+
+function setGauge(id, value, unit, warn){
+  const el = document.getElementById(id);
+  el.classList.remove('empty','warn');
+  if(warn) el.classList.add('warn');
+  el.querySelector('.g-value').innerHTML = value + '<span class="g-unit">'+unit+'</span>';
+}
+
+function calcBoiler(){
+  const msteam = parseFloat(document.getElementById('msteam').value); // kg/h
+  const hsteam = parseFloat(document.getElementById('hsteam').value); // kJ/kg
+  const hfw = parseFloat(document.getElementById('hfw').value); // kJ/kg
+  const lhv = parseFloat(document.getElementById('lhv').value); // kJ/kg
+  const etaBoiler = parseFloat(document.getElementById('etaBoiler').value);
+
+  let qbKw = null;
+
+  // 1. Boiler heat load
+  if(!isNaN(msteam) && !isNaN(hsteam) && !isNaN(hfw)){
+    const qbKjH = msteam * (hsteam - hfw); // kJ/h
+    qbKw = qbKjH / 3600; // kW
+    setGauge('g-qb', qbKw.toFixed(1), 'kW');
+  }
+
+  // 2. Fuel consumption
+  if(qbKw !== null && !isNaN(lhv) && !isNaN(etaBoiler) && lhv > 0 && etaBoiler > 0){
+    const fuelKgH = (qbKw * 3600) / (lhv * etaBoiler);
+    setGauge('g-fuel', fuelKgH.toFixed(2), 'kg/h');
+  }
+}
+</script>
+
+</body>
+</html>

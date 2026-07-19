@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پمپ و لوله‌کشی | دریانورد</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body class="grid-bg">
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="title">دریانورد</div>
+        <div class="subtitle">سامانه محاسبات مهندسی دریایی</div>
+      </div>
+    </div>
+    <div class="header-nav">
+      <a class="nav-link" href="keyboard.html">🔤 نمادها</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">→ بازگشت به داشبورد</a>
+
+  <div class="page-head">
+    <span class="kicker">// PUMPS & PIPING SYSTEMS</span>
+    <h1>پمپ و لوله‌کشی</h1>
+    <p>محاسبهٔ سرعت سیال، افت فشار خط لوله (دارسی-وایسباخ)، NPSH موجود و توان لازم پمپ.</p>
+  </div>
+
+  <div class="calc-layout">
+    <div class="panel">
+      <div class="section-title">۱. سرعت سیال در لوله</div>
+      <div class="formula" id="f-v"></div>
+      <div class="two-col">
+        <div class="field">
+          <label>دبی حجمی (Q) <span class="unit">m³/h</span></label>
+          <input type="number" id="q" placeholder="مثلاً 120" step="any">
+        </div>
+        <div class="field">
+          <label>قطر داخلی لوله (D) <span class="unit">mm</span></label>
+          <input type="number" id="dmm" placeholder="مثلاً 150" step="any">
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۲. افت فشار خط لوله (دارسی-وایسباخ)</div>
+      <div class="formula" id="f-hf"></div>
+      <div class="two-col">
+        <div class="field">
+          <label>ضریب اصطکاک (f) <span class="unit">—</span></label>
+          <input type="number" id="fric" placeholder="مثلاً 0.02" step="any" value="0.02">
+        </div>
+        <div class="field">
+          <label>طول معادل لوله (L) <span class="unit">m</span></label>
+          <input type="number" id="lpipe" placeholder="مثلاً 40" step="any">
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۳. NPSH موجود</div>
+      <div class="formula" id="f-npsh"></div>
+      <div class="two-col">
+        <div class="field">
+          <label>فشار اتمسفر (P_atm) <span class="unit">kPa</span></label>
+          <input type="number" id="patm" placeholder="101.3" step="any" value="101.3">
+        </div>
+        <div class="field">
+          <label>فشار بخار سیال (P_vap) <span class="unit">kPa</span></label>
+          <input type="number" id="pvap" placeholder="مثلاً 2.3 (آب 20°C)" step="any" value="2.3">
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>ارتفاع استاتیک مکش (h_s) <span class="unit">m</span></label>
+          <input type="number" id="hs" placeholder="مثلاً 1.5 (منفی اگر پمپ بالاتر است)" step="any">
+        </div>
+        <div class="field">
+          <label>چگالی سیال (ρ) <span class="unit">kg/m³</span></label>
+          <input type="number" id="rho" placeholder="1000" step="any" value="1000">
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۴. توان لازم پمپ</div>
+      <div class="formula" id="f-power"></div>
+      <div class="two-col">
+        <div class="field">
+          <label>هد کل پمپ (H) <span class="unit">m</span></label>
+          <input type="number" id="head" placeholder="مثلاً 25" step="any">
+        </div>
+        <div class="field">
+          <label>بازده پمپ (η) <span class="unit">0–1</span></label>
+          <input type="number" id="etaPump" placeholder="0.72" step="any" value="0.72">
+        </div>
+      </div>
+
+      <button class="btn" onclick="calcPump()">محاسبه</button>
+    </div>
+
+    <div class="results-panel panel">
+      <div class="section-title">نتایج</div>
+      <div class="gauge-list">
+        <div class="gauge empty" id="g-v">
+          <span class="g-label">سرعت سیال (V)</span>
+          <span class="g-value">—<span class="g-unit">m/s</span></span>
+        </div>
+        <div class="gauge empty" id="g-hf">
+          <span class="g-label">افت فشار خط (h_f)</span>
+          <span class="g-value">—<span class="g-unit">m</span></span>
+        </div>
+        <div class="gauge empty" id="g-npsh">
+          <span class="g-label">NPSH موجود</span>
+          <span class="g-value">—<span class="g-unit">m</span></span>
+        </div>
+        <div class="gauge empty" id="g-power">
+          <span class="g-label">توان محوری پمپ</span>
+          <span class="g-value">—<span class="g-unit">kW</span></span>
+        </div>
+      </div>
+      <div class="note-box" id="v-note">
+        <strong>توجه:</strong> سرعت سیال در خطوط مکش معمولاً باید زیر ۲ m/s و در خطوط تخلیه بین ۲ تا ۳٫۵ m/s نگه داشته شود تا از کاویتاسیون و افت فشار زیاد جلوگیری شود.
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-box">
+    <div class="section-title">منابع و مراجع</div>
+    <ul>
+      <li>Sularia, M. — Pumping Manual International</li>
+      <li>Woodyard, D. — Pounder's Marine Diesel Engines and Gas Turbines (فصل سیستم‌های کمکی)</li>
+      <li>یادداشت‌های درسی ماشین‌های سیال و سیستم‌های کشتی — دانشگاه علوم و فنون دریایی خرمشهر</li>
+    </ul>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>دریانورد — ماژول پمپ و لوله‌کشی</span>
+    <span>پروژهٔ کارشناسی</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="assets/common.js"></script>
+<script>
+katex.render("V = \\dfrac{Q}{A} \\qquad A = \\dfrac{\\pi D^{2}}{4}", document.getElementById('f-v'), {throwOnError:false, displayMode:true});
+katex.render("h_f = f \\, \\dfrac{L}{D} \\, \\dfrac{V^{2}}{2g}", document.getElementById('f-hf'), {throwOnError:false, displayMode:true});
+katex.render("NPSH_a = \\dfrac{P_{atm}-P_{vap}}{\\rho g} + h_s - h_f", document.getElementById('f-npsh'), {throwOnError:false, displayMode:true});
+katex.render("P = \\dfrac{\\rho \\, g \\, Q \\, H}{\\eta}", document.getElementById('f-power'), {throwOnError:false, displayMode:true});
+
+function setGauge(id, value, unit, warn){
+  const el = document.getElementById(id);
+  el.classList.remove('empty','warn');
+  if(warn) el.classList.add('warn');
+  el.querySelector('.g-value').innerHTML = value + '<span class="g-unit">'+unit+'</span>';
+}
+
+let vGlobal = null, hfGlobal = null;
+
+function calcPump(){
+  const q = parseFloat(document.getElementById('q').value); // m3/h
+  const dmm = parseFloat(document.getElementById('dmm').value); // mm
+  const fric = parseFloat(document.getElementById('fric').value);
+  const lpipe = parseFloat(document.getElementById('lpipe').value);
+  const patm = parseFloat(document.getElementById('patm').value); // kPa
+  const pvap = parseFloat(document.getElementById('pvap').value); // kPa
+  const hs = parseFloat(document.getElementById('hs').value);
+  const rho = parseFloat(document.getElementById('rho').value);
+  const head = parseFloat(document.getElementById('head').value);
+  const etaPump = parseFloat(document.getElementById('etaPump').value);
+  const g = 9.81;
+
+  // 1. Velocity
+  if(!isNaN(q) && !isNaN(dmm) && dmm > 0){
+    const qM3s = q / 3600;
+    const dM = dmm / 1000;
+    const area = Math.PI * Math.pow(dM,2) / 4;
+    vGlobal = qM3s / area;
+    const warn = vGlobal > 3.5;
+    setGauge('g-v', vGlobal.toFixed(2), 'm/s', warn);
+    document.getElementById('v-note').style.display = warn ? 'block' : 'none';
+  }
+
+  // 2. Head loss
+  if(vGlobal !== null && !isNaN(fric) && !isNaN(lpipe) && !isNaN(dmm)){
+    const dM = dmm/1000;
+    hfGlobal = fric * (lpipe/dM) * (Math.pow(vGlobal,2)/(2*g));
+    setGauge('g-hf', hfGlobal.toFixed(3), 'm');
+  }
+
+  // 3. NPSH available
+  if(!isNaN(patm) && !isNaN(pvap) && !isNaN(rho) && !isNaN(hs) && hfGlobal !== null && rho > 0){
+    const npsha = ((patm - pvap)*1000)/(rho*g) + hs - hfGlobal;
+    const warn = npsha < 1;
+    setGauge('g-npsh', npsha.toFixed(2), 'm', warn);
+  }
+
+  // 4. Pump power
+  if(!isNaN(rho) && !isNaN(q) && !isNaN(head) && !isNaN(etaPump) && etaPump > 0){
+    const qM3s = q/3600;
+    const powerKw = (rho*g*qM3s*head)/(etaPump*1000);
+    setGauge('g-power', powerKw.toFixed(2), 'kW');
+  }
+}
+</script>
+
+</body>
+</html>

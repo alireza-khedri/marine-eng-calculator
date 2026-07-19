@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مبدل حرارتی و خنک‌کاری | دریانورد</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body class="grid-bg">
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="title">دریانورد</div>
+        <div class="subtitle">سامانه محاسبات مهندسی دریایی</div>
+      </div>
+    </div>
+    <div class="header-nav">
+      <a class="nav-link" href="keyboard.html">🔤 نمادها</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">→ بازگشت به داشبورد</a>
+
+  <div class="page-head">
+    <span class="kicker">// HEAT EXCHANGERS & COOLING</span>
+    <h1>مبدل حرارتی و خنک‌کاری</h1>
+    <p>محاسبهٔ بار حرارتی، اختلاف دمای میانگین لگاریتمی (LMTD) و سطح انتقال حرارت لازم برای کولرهای آب شیرین، روغن و هوا.</p>
+  </div>
+
+  <div class="calc-layout">
+    <div class="panel">
+      <div class="section-title">۱. بار حرارتی</div>
+      <div class="formula" id="f-q"></div>
+      <div class="two-col">
+        <div class="field">
+          <label>دبی جرمی سیال داغ (ṁ) <span class="unit">kg/s</span></label>
+          <input type="number" id="mdot" placeholder="مثلاً 4.2" step="any">
+        </div>
+        <div class="field">
+          <label>ظرفیت گرمایی ویژه (Cp) <span class="unit">kJ/kg·K</span></label>
+          <input type="number" id="cp" placeholder="4.18 (آب) / 2.1 (روغن)" step="any" value="4.18">
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>دمای ورودی سیال داغ (T_h,in) <span class="unit">°C</span></label>
+          <input type="number" id="thin" placeholder="مثلاً 85" step="any">
+        </div>
+        <div class="field">
+          <label>دمای خروجی سیال داغ (T_h,out) <span class="unit">°C</span></label>
+          <input type="number" id="thout" placeholder="مثلاً 70" step="any">
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۲. اختلاف دمای میانگین لگاریتمی (LMTD)</div>
+      <div class="formula" id="f-lmtd"></div>
+      <div class="two-col">
+        <div class="field">
+          <label>دمای ورودی سیال سرد (T_c,in) <span class="unit">°C</span></label>
+          <input type="number" id="tcin" placeholder="مثلاً 32" step="any">
+        </div>
+        <div class="field">
+          <label>دمای خروجی سیال سرد (T_c,out) <span class="unit">°C</span></label>
+          <input type="number" id="tcout" placeholder="مثلاً 45" step="any">
+        </div>
+      </div>
+      <div class="field">
+        <label>آرایش جریان</label>
+        <select id="flowType">
+          <option value="counter">مخالف‌جریان (Counter-flow)</option>
+          <option value="parallel">هم‌جریان (Parallel-flow)</option>
+        </select>
+      </div>
+
+      <div class="section-title" style="margin-top:26px;">۳. سطح انتقال حرارت لازم</div>
+      <div class="formula" id="f-area"></div>
+      <div class="field">
+        <label>ضریب کلی انتقال حرارت (U) <span class="unit">W/m²·K</span></label>
+        <input type="number" id="u" placeholder="مثلاً 800 (آب-آب پوسته‌لوله)" step="any" value="800">
+        <div class="hint">بازهٔ رایج: ۸۰۰–۱۵۰۰ برای آب-آب، ۲۰۰–۵۰۰ برای روغن-آب، ۳۰–۶۰ برای هوا-آب.</div>
+      </div>
+
+      <button class="btn" onclick="calcHeatExchanger()">محاسبه</button>
+    </div>
+
+    <div class="results-panel panel">
+      <div class="section-title">نتایج</div>
+      <div class="gauge-list">
+        <div class="gauge empty" id="g-q">
+          <span class="g-label">بار حرارتی (Q)</span>
+          <span class="g-value">—<span class="g-unit">kW</span></span>
+        </div>
+        <div class="gauge empty" id="g-lmtd">
+          <span class="g-label">LMTD</span>
+          <span class="g-value">—<span class="g-unit">°C</span></span>
+        </div>
+        <div class="gauge empty" id="g-area">
+          <span class="g-label">سطح انتقال حرارت لازم (A)</span>
+          <span class="g-value">—<span class="g-unit">m²</span></span>
+        </div>
+      </div>
+      <div class="note-box">
+        <strong>توجه:</strong> این محاسبه مبدل را به‌صورت جریان خالص هم‌جریان یا مخالف‌جریان فرض می‌کند. برای مبدل‌های پوسته-لوله چندگذره باید یک ضریب اصلاح F (کمتر از ۱) نیز در مخرج فرمول سطح ضرب شود.
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-box">
+    <div class="section-title">منابع و مراجع</div>
+    <ul>
+      <li>Incropera, F.P. — Fundamentals of Heat and Mass Transfer</li>
+      <li>Woodyard, D. — Pounder's Marine Diesel Engines and Gas Turbines (سیستم خنک‌کاری)</li>
+      <li>یادداشت‌های درسی انتقال حرارت و سیستم‌های کمکی — دانشگاه علوم و فنون دریایی خرمشهر</li>
+    </ul>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>دریانورد — ماژول مبدل حرارتی</span>
+    <span>پروژهٔ کارشناسی</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="assets/common.js"></script>
+<script>
+katex.render("Q = \\dot{m} \\, C_p \\, (T_{h,in}-T_{h,out})", document.getElementById('f-q'), {throwOnError:false, displayMode:true});
+katex.render("\\Delta T_{lm} = \\dfrac{\\Delta T_1 - \\Delta T_2}{\\ln(\\Delta T_1/\\Delta T_2)}", document.getElementById('f-lmtd'), {throwOnError:false, displayMode:true});
+katex.render("A = \\dfrac{Q}{U \\times \\Delta T_{lm}}", document.getElementById('f-area'), {throwOnError:false, displayMode:true});
+
+function setGauge(id, value, unit, warn){
+  const el = document.getElementById(id);
+  el.classList.remove('empty','warn');
+  if(warn) el.classList.add('warn');
+  el.querySelector('.g-value').innerHTML = value + '<span class="g-unit">'+unit+'</span>';
+}
+
+let qGlobal = null, lmtdGlobal = null;
+
+function calcHeatExchanger(){
+  const mdot = parseFloat(document.getElementById('mdot').value);
+  const cp = parseFloat(document.getElementById('cp').value);
+  const thin = parseFloat(document.getElementById('thin').value);
+  const thout = parseFloat(document.getElementById('thout').value);
+  const tcin = parseFloat(document.getElementById('tcin').value);
+  const tcout = parseFloat(document.getElementById('tcout').value);
+  const flowType = document.getElementById('flowType').value;
+  const u = parseFloat(document.getElementById('u').value);
+
+  // 1. Heat duty
+  if(!isNaN(mdot) && !isNaN(cp) && !isNaN(thin) && !isNaN(thout)){
+    qGlobal = mdot * cp * (thin - thout);
+    setGauge('g-q', qGlobal.toFixed(2), 'kW');
+  }
+
+  // 2. LMTD
+  if(!isNaN(thin) && !isNaN(thout) && !isNaN(tcin) && !isNaN(tcout)){
+    let dT1, dT2;
+    if(flowType === 'counter'){
+      dT1 = thin - tcout;
+      dT2 = thout - tcin;
+    } else {
+      dT1 = thin - tcin;
+      dT2 = thout - tcout;
+    }
+    if(dT1 > 0 && dT2 > 0 && dT1 !== dT2){
+      lmtdGlobal = (dT1 - dT2) / Math.log(dT1/dT2);
+      setGauge('g-lmtd', lmtdGlobal.toFixed(2), '°C');
+    } else if(dT1 > 0 && dT2 > 0 && dT1 === dT2){
+      lmtdGlobal = dT1;
+      setGauge('g-lmtd', lmtdGlobal.toFixed(2), '°C');
+    } else {
+      setGauge('g-lmtd', 'نامعتبر', '', true);
+      lmtdGlobal = null;
+    }
+  }
+
+  // 3. Area
+  if(qGlobal !== null && lmtdGlobal !== null && !isNaN(u) && u > 0){
+    const areaM2 = (qGlobal*1000) / (u * lmtdGlobal);
+    setGauge('g-area', areaM2.toFixed(2), 'm²');
+  }
+}
+</script>
+
+</body>
+</html>
