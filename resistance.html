@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مقاومت و پیشرانش کشتی | دریانورد</title>
 <link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 </head>
 <body class="grid-bg">
 
@@ -17,7 +18,9 @@
         <div class="subtitle">سامانه محاسبات مهندسی دریایی</div>
       </div>
     </div>
-    <div class="header-tag">MODULE 02 / RESISTANCE</div>
+    <div class="header-nav">
+      <a class="nav-link" href="keyboard.html">🔤 نمادها</a>
+    </div>
   </div>
 </header>
 
@@ -33,7 +36,7 @@
   <div class="calc-layout">
     <div class="panel">
       <div class="section-title">۱. عدد فرود</div>
-      <div class="formula">Fn = V / √(g × L)</div>
+      <div class="formula" id="f-fn"></div>
       <div class="two-col">
         <div class="field">
           <label>سرعت شناور (V) <span class="unit">m/s</span></label>
@@ -46,7 +49,7 @@
       </div>
 
       <div class="section-title" style="margin-top:26px;">۲. توان با روش ضریب آدمیرالتی</div>
-      <div class="formula">P [kW] = Δ^(2/3) × V_kn^3 / C_A</div>
+      <div class="formula" id="f-p"></div>
       <div class="two-col">
         <div class="field">
           <label>وزن جابه‌جایی (Δ) <span class="unit">ton</span></label>
@@ -64,7 +67,7 @@
       </div>
 
       <div class="section-title" style="margin-top:26px;">۳. توان مؤثر (EHP)</div>
-      <div class="formula">EHP = SHP × η_D</div>
+      <div class="formula" id="f-ehp"></div>
       <div class="field">
         <label>ضریب پیشرانش کلی (η_D) <span class="unit">0–1</span></label>
         <input type="number" id="etaD" placeholder="0.65" step="any" value="0.65">
@@ -112,7 +115,13 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="assets/common.js"></script>
 <script>
+katex.render("Fn = \\dfrac{V}{\\sqrt{g \\times L}}", document.getElementById('f-fn'), {throwOnError:false, displayMode:true});
+katex.render("P_{[kW]} = \\dfrac{\\Delta^{2/3} \\times V_{kn}^{3}}{C_A}", document.getElementById('f-p'), {throwOnError:false, displayMode:true});
+katex.render("EHP = SHP \\times \\eta_D", document.getElementById('f-ehp'), {throwOnError:false, displayMode:true});
+
 function setGauge(id, value, unit, warn){
   const el = document.getElementById(id);
   el.classList.remove('empty','warn');

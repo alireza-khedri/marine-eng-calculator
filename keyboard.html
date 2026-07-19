@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نمادها و کیبورد ریاضی | دریانورد</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body class="grid-bg">
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="title">دریانورد</div>
+        <div class="subtitle">سامانه محاسبات مهندسی دریایی</div>
+      </div>
+    </div>
+    <div class="header-nav">
+      <a class="nav-link" href="index.html">داشبورد</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">→ بازگشت به داشبورد</a>
+
+  <div class="page-head">
+    <span class="kicker">// MATH SYMBOLS & FORMULA BUILDER</span>
+    <h1>نمادها و کیبورد ریاضی</h1>
+    <p>روی هر نماد کلیک کن تا در کلیپ‌بورد کپی بشه (برای استفاده در گزارش، Word یا هرجای دیگه). پایین صفحه هم می‌تونی فرمول دلخواهت رو با نمادهای ریاضی بسازی و به‌صورت زنده ببینی.</p>
+  </div>
+
+  <div class="panel" style="margin-top:26px;">
+    <div class="kb-tabs">
+      <button class="kb-tab active" data-group="greek">حروف یونانی</button>
+      <button class="kb-tab" data-group="power">توان و ریشه</button>
+      <button class="kb-tab" data-group="op">عملگر و رابطه</button>
+      <button class="kb-tab" data-group="sub">زیرنویس و بالانویس</button>
+      <button class="kb-tab" data-group="misc">متفرقه</button>
+    </div>
+
+    <div class="symbol-group active" data-group="greek">
+      <div class="symbol-grid" id="grid-greek"></div>
+    </div>
+    <div class="symbol-group" data-group="power">
+      <div class="symbol-grid" id="grid-power"></div>
+    </div>
+    <div class="symbol-group" data-group="op">
+      <div class="symbol-grid" id="grid-op"></div>
+    </div>
+    <div class="symbol-group" data-group="sub">
+      <div class="symbol-grid" id="grid-sub"></div>
+    </div>
+    <div class="symbol-group" data-group="misc">
+      <div class="symbol-grid" id="grid-misc"></div>
+    </div>
+  </div>
+
+  <div class="panel builder-panel">
+    <div class="section-title">فرمول‌ساز زنده (LaTeX)</div>
+    <p style="font-size:13px;color:var(--text-dim);margin-top:-8px;">
+      از دکمه‌های زیر برای درج سریع قالب‌های ریاضی (کسر، توان، رادیکال...) استفاده کن، یا مستقیم کد LaTeX تایپ کن.
+    </p>
+    <div class="snippet-row">
+      <button class="snippet-btn" data-insert="\dfrac{a}{b}">کسر  a/b</button>
+      <button class="snippet-btn" data-insert="x^{2}">توان  xⁿ</button>
+      <button class="snippet-btn" data-insert="\sqrt{x}">رادیکال  √x</button>
+      <button class="snippet-btn" data-insert="x_{i}">زیرنویس  xᵢ</button>
+      <button class="snippet-btn" data-insert="\times">×</button>
+      <button class="snippet-btn" data-insert="\approx">≈</button>
+      <button class="snippet-btn" data-insert="\sum_{i=1}^{n}">جمع  Σ</button>
+    </div>
+
+    <textarea class="builder-input" id="latexInput" placeholder="مثلاً: GM = KB + \dfrac{I_T}{\nabla} - KG">GM = KB + \dfrac{I_T}{\nabla} - KG</textarea>
+
+    <div class="builder-preview" id="latexPreview"></div>
+
+    <div class="builder-actions">
+      <button class="btn-small primary" onclick="copyLatexCode()">کپی کد LaTeX</button>
+      <button class="btn-small" onclick="copyPreviewText()">کپی متن ساده فرمول</button>
+    </div>
+  </div>
+
+  <div class="note-box" style="margin-top:24px;">
+    <strong>راهنمای استفاده در Word:</strong> برای فرمول‌های ساده، همون نمادهای کپی‌شده (مثل η، √، ×) رو مستقیم Paste کن، معمولاً درست نمایش داده می‌شن.
+    برای فرمول‌های حرفه‌ای‌تر با کسر و توان، کد LaTeX رو کپی کن و داخل Word، بعد از باز کردن جعبهٔ معادله (Insert → Equation → دکمهٔ LaTeX در گروه Conversions)، Paste کن.
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>دریانورد — نمادها و کیبورد ریاضی</span>
+    <span>پروژهٔ کارشناسی</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="assets/common.js"></script>
+<script>
+const symbols = {
+  greek: [
+    ['η','اتا'], ['θ','تتا'], ['Δ','دلتا'], ['δ','دلتای کوچک'],
+    ['Σ','سیگما بزرگ'], ['σ','سیگما کوچک'], ['π','پی'], ['ρ','رو'],
+    ['φ','فی'], ['ω','امگا'], ['λ','لاندا'], ['α','آلفا'],
+    ['β','بتا'], ['γ','گاما'], ['μ','میو'], ['∇','نابلا']
+  ],
+  power: [
+    ['²','توان ۲'], ['³','توان ۳'], ['ⁿ','توان n'], ['√','رادیکال'],
+    ['∛','ریشه سوم'], ['⁻¹','توان منفی۱'], ['ᵏ','توان k'], ['⁰','توان صفر']
+  ],
+  op: [
+    ['×','ضرب'], ['÷','تقسیم'], ['±','مثبت‌منفی'], ['∓','منفی‌مثبت'],
+    ['≈','تقریباً'], ['≠','نامساوی'], ['≤','کوچک‌مساوی'], ['≥','بزرگ‌مساوی'],
+    ['∞','بی‌نهایت'], ['∝','متناسب'], ['°','درجه'], ['′','آنی/دقیقه']
+  ],
+  sub: [
+    ['₀','زیرنویس۰'], ['₁','زیرنویس۱'], ['₂','زیرنویس۲'], ['₃','زیرنویس۳'],
+    ['ᵢ','زیرنویس i'], ['ₓ','زیرنویس x'], ['ₜ','زیرنویس t'], ['ₐ','زیرنویس a']
+  ],
+  misc: [
+    ['∫','انتگرال'], ['∂','مشتق جزئی'], ['∑','مجموع'], ['∏','حاصل‌ضرب'],
+    ['∈','عضویت'], ['∅','مجموعه تهی'], ['⇒','نتیجه'], ['↔','رابطه دوطرفه']
+  ]
+};
+
+function buildGrids(){
+  Object.keys(symbols).forEach(group=>{
+    const grid = document.getElementById('grid-'+group);
+    symbols[group].forEach(([sym, name])=>{
+      const btn = document.createElement('button');
+      btn.className = 'symbol-btn';
+      btn.innerHTML = sym + '<span class="sym-name">'+name+'</span>';
+      btn.onclick = ()=> copyToClipboard(sym, 'نماد «'+sym+'» کپی شد');
+      grid.appendChild(btn);
+    });
+  });
+}
+buildGrids();
+
+// tabs
+document.querySelectorAll('.kb-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.kb-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.symbol-group').forEach(g=>g.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelector('.symbol-group[data-group="'+tab.dataset.group+'"]').classList.add('active');
+  });
+});
+
+// snippet insert
+document.querySelectorAll('.snippet-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const input = document.getElementById('latexInput');
+    const insert = btn.dataset.insert;
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? input.value.length;
+    input.value = input.value.slice(0,start) + insert + input.value.slice(end);
+    input.focus();
+    input.selectionStart = input.selectionEnd = start + insert.length;
+    renderPreview();
+  });
+});
+
+function renderPreview(){
+  const src = document.getElementById('latexInput').value;
+  const target = document.getElementById('latexPreview');
+  try{
+    katex.render(src, target, { throwOnError: false, displayMode: true });
+  }catch(e){
+    target.textContent = 'خطا در فرمول';
+  }
+}
+
+document.getElementById('latexInput').addEventListener('input', renderPreview);
+renderPreview();
+
+function copyLatexCode(){
+  copyToClipboard(document.getElementById('latexInput').value, 'کد LaTeX کپی شد');
+}
+function copyPreviewText(){
+  const target = document.getElementById('latexPreview');
+  copyToClipboard(target.textContent, 'متن فرمول کپی شد');
+}
+</script>
+
+</body>
+</html>
