@@ -182,7 +182,6 @@ a{ color: inherit; text-decoration: none; }
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 0;
-  margin: 26px 0 56px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -199,7 +198,7 @@ a{ color: inherit; text-decoration: none; }
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 9px;
+  gap: 2px;
   padding: 22px 18px;
   position: relative;
   border-inline-end: 1px solid var(--border-soft);
@@ -286,7 +285,6 @@ a{ color: inherit; text-decoration: none; }
   color: var(--teal);
   font-family: var(--font-mono);
   white-space: nowrap;
-  margin-top: 4px;
   opacity: 0;
   transform: translateY(-3px);
   transition: opacity .15s ease, transform .15s ease;
