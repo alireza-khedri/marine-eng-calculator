@@ -1,5 +1,3 @@
-// ابزار مشترک: کپی در کلیپ‌بورد + نمایش پیام تأیید (toast)
-
 function ensureToast(){
   let t = document.querySelector('.toast');
   if(!t){
